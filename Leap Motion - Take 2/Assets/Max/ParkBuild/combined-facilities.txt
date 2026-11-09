@@ -1,0 +1,22 @@
+Central funbox: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 8 material sections.
+Long grind ledge: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 4 material sections.
+Manual pad: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 4 material sections.
+Flat bar - beginner: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 4 material sections.
+Round rail - intermediate: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 4 material sections.
+Six stair hubba set: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 25 material sections.
+Low kicker: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 3 material sections.
+Northeast bank platform: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 2 material sections.
+Bank platform rail: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 4 material sections.
+Diagonal ledge line: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 4 material sections.
+South manual line: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 4 material sections.
+Low practice rail: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 4 material sections.
+North quarter pipe: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 8 material sections.
+West return quarter: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 8 material sections.
+East return quarter: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 8 material sections.
+Twin pump rollers: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 2 material sections.
+South return quarter: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 8 material sections.
+Spine transfer: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 3 material sections.
+Clover bowl - 3m deep: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 11 material sections.
+Learner bowl - 1.8m deep: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 11 material sections.
+Deep bowl deck ledge: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 4 material sections.
+Shallow bowl deck ledge: one GameObject, MeshFilter, MeshRenderer and non-convex MeshCollider; 4 material sections.

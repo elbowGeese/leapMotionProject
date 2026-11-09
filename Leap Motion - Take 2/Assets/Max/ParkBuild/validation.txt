@@ -1,0 +1,5 @@
+PASS: Five park groups; 502 meshes; 53124 triangles; 156 colliders.
+PASS: 22 facilities each have one root MeshFilter, MeshRenderer and MeshCollider, with no loose face children.
+PASS: No text objects; finite mesh vertices, valid indices, preserved material sections.
+PASS: Clear spawn and circulation spine; both bowl floors, stair landing, enlarged funbox, deck corners, new spine, bank platform and ledges.
+Scene: Assets/Max/MaxScene.unity
