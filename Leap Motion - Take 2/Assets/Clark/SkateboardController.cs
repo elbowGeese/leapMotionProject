@@ -6,8 +6,12 @@ namespace Fingerboard
     [RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
     public class SkateboardController : MonoBehaviour
     {
-        private enum State { Grounded, Airborne, Crashed }
-        private enum Trick { None, Ollie, Kickflip }
+        // scoring
+        private RoundManager rm;
+        [HideInInspector] public bool isBraced = false;
+
+        public enum State { Grounded, Airborne, Crashed }
+        public enum Trick { None, Ollie, Kickflip }
 
         [Header("Board Visual")]
         [SerializeField] private Transform boardVisual;
@@ -83,6 +87,8 @@ namespace Fingerboard
 
         private void Awake()
         {
+            rm = FindAnyObjectByType<RoundManager>();
+
             body = GetComponent<Rigidbody>();
             wheelContact = GetComponent<SphereCollider>();
             spawnPosition = body.position;
@@ -133,7 +139,9 @@ namespace Fingerboard
             bool hasGround = activeTrick == Trick.None && ReadGround();
 
             if (state == State.Airborne && hasGround && Velocity.y <= 0.05f)
+            {
                 state = State.Grounded;
+            }
 
             if (state == State.Grounded)
             {
@@ -275,6 +283,12 @@ namespace Fingerboard
             {
                 Crash("landed before the trick finished");
                 return;
+            }
+
+            Debug.Log("WAS AIRBORNE NOW GROUNDED");
+            if (rm != null)
+            {
+                rm.Land(activeTrick, airTime, isBraced);
             }
 
             state = State.Grounded;

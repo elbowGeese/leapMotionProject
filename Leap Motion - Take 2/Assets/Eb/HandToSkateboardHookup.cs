@@ -6,6 +6,8 @@ public class HandToSkateboardHookup : MonoBehaviour
     private HandInput handInput;
     private SkateboardController board;
 
+    public bool isActive = false;
+
     private void Awake()
     {
         handInput = FindAnyObjectByType<HandInput>();
@@ -16,16 +18,20 @@ public class HandToSkateboardHookup : MonoBehaviour
 
     void Update()
     {
+        if (!isActive) { return; }
+
         bool push = false;
         bool ollie = false;
         bool kickflip = false;
         bool manual = false;
         float sideInput = 0f;
+        bool isBraced = false;
 
         // get input
         switch (handInput._state)
         {
             case HandInput.HandState.CRUISING:
+                isBraced = true;
                 break;
             case HandInput.HandState.PUSHING:
                 push = true;
@@ -60,6 +66,7 @@ public class HandToSkateboardHookup : MonoBehaviour
         board.SetPushInput(push ? 1f : 0f);
         board.SetManual(manual);
         board.SetSideInput(sideInput);
+        board.isBraced = isBraced;
 
         if (kickflip)
             board.RequestKickflip();
