@@ -1,0 +1,3 @@
+PASS: 600 simulation steps at 0.01 seconds in an isolated physics scene.
+PASS: Spheres settle on both bowl floors at expected heights.
+PASS: Rolling sphere climbs the quarter pipe and remains above the riding surface.
