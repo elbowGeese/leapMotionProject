@@ -31,6 +31,11 @@ public class HandInput : MonoBehaviour
             _state = CheckHandState(frame.Hands[0]);
             _leanState = CheckHandLeanState(frame.Hands[0]);
         }
+        else
+        {
+            _state = HandState.NONE;
+            _leanState = LeanState.CENTERED;
+        }
     }
 
     private LeanState CheckHandLeanState(Hand hand)
@@ -93,43 +98,48 @@ public class HandInput : MonoBehaviour
 
     private bool IsPushing(Hand hand)
     {
-        bool indexDown = false;
-        bool middleDown = false;
+        bool indexDown = hand.fingers[1].IsExtended;
+        bool middlePush = !hand.fingers[2].IsExtended;
 
-        bool indexPush = false;
-        bool middlePush = false;
+        //// check index finger = fingers[1]
+        //Vector3 indexFingerDir = hand.fingers[1].Direction;
+        //float indexDot = Vector3.Dot(indexFingerDir, Vector3.down);
+        //if (hand.fingers[1].IsExtended && indexDot >= downThreshold)
+        //{
+        //    indexDown = true;
+        //}
+
+        //// check middle finger = fingers[2]
+        //Vector3 middleFingerDir = hand.fingers[2].Direction;
+        //float middleDot = Vector3.Dot(middleFingerDir, Vector3.down);
+        //if (middleDot <= downThreshold)
+        //{
+        //    middlePush = true;
+        //}
+
+        return (indexDown && middlePush);
+    }
+
+    private bool IsPopping(Hand hand)
+    {
+        bool indexUp = false;
+        bool middleUp = false;
 
         // check index finger = fingers[1]
         Vector3 indexFingerDir = hand.fingers[1].Direction;
         float indexDot = Vector3.Dot(indexFingerDir, Vector3.down);
-        if (hand.fingers[1].IsExtended && indexDot >= downThreshold)
+        if (!hand.fingers[1].IsExtended && indexDot < downThreshold)
         {
-            indexDown = true;
-        }
-        else if(indexDot <= downThreshold)
-        {
-            indexPush = true;
+            indexUp = true;
         }
 
         // check middle finger = fingers[2]
         Vector3 middleFingerDir = hand.fingers[2].Direction;
         float middleDot = Vector3.Dot(middleFingerDir, Vector3.down);
-        if (hand.fingers[2].IsExtended && middleDot >= downThreshold)
+        if (!hand.fingers[2].IsExtended && middleDot <= downThreshold)
         {
-            middleDown = true;
+            middleUp = true;
         }
-        else if (middleDot <= downThreshold)
-        {
-            middlePush = true;
-        }
-
-        return (indexDown && middlePush) || (middleDown && indexPush);
-    }
-
-    private bool IsPopping(Hand hand)
-    {
-        bool indexUp = !hand.fingers[1].IsExtended;
-        bool middleUp = !hand.fingers[2].IsExtended;
 
         return (indexUp && !middleUp) || (middleUp && !indexUp);
     }
@@ -144,29 +154,26 @@ public class HandInput : MonoBehaviour
 
     private bool IsSpinning(Hand hand)
     {
-        bool indexUp = !hand.fingers[1].IsExtended;
-        bool middleUp = !hand.fingers[2].IsExtended;
-
-        bool indexOut = false;
-        bool middleOut = false;
+        bool middleDown = false;
+        bool indexPush = false;
 
         // check index finger = fingers[1]
         Vector3 indexFingerDir = hand.fingers[1].Direction;
         float indexDot = Vector3.Dot(indexFingerDir, Vector3.down);
-        if (hand.fingers[1].IsExtended && indexDot <= downThreshold)
+        if (indexDot <= downThreshold)
         {
-            indexOut = true;
+            indexPush = true;
         }
 
         // check middle finger = fingers[2]
         Vector3 middleFingerDir = hand.fingers[2].Direction;
         float middleDot = Vector3.Dot(middleFingerDir, Vector3.down);
-        if (hand.fingers[2].IsExtended && middleDot <= downThreshold)
+        if (hand.fingers[2].IsExtended && middleDot >= downThreshold)
         {
-            middleOut = true;
+            middleDown = true;
         }
 
-        return (indexUp && middleOut) || (middleUp && indexOut);
+        return (middleDown && indexPush);
     }
 
     #endregion
