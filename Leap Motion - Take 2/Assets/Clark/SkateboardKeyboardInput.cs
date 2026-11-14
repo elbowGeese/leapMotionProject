@@ -7,89 +7,58 @@ using UnityEngine.InputSystem;
 namespace Fingerboard
 {
     [RequireComponent(typeof(SkateboardController))]
-    public class SkateboardInput : MonoBehaviour
+    public class SkateboardKeyboardInput : MonoBehaviour
     {
         private SkateboardController board;
 
-        private void Awake()
-        {
-            board = GetComponent<SkateboardController>();
-        }
+        private void Awake() => board = GetComponent<SkateboardController>();
 
         private void Update()
         {
-            bool push;
-            bool left;
-            bool right;
-            bool manual;
-            bool ollie;
-            bool kickflip;
-            bool reset;
-
 #if ENABLE_INPUT_SYSTEM
             Keyboard keyboard = Keyboard.current;
+
             if (keyboard == null)
             {
-                ReleaseHeldInput();
+                board.SetSideInput(0f);
                 return;
             }
 
-            push = keyboard.wKey.isPressed;
-            left = keyboard.aKey.isPressed;
-            right = keyboard.dKey.isPressed;
-            manual = keyboard.leftShiftKey.isPressed || keyboard.rightShiftKey.isPressed;
-            ollie = keyboard.spaceKey.wasPressedThisFrame;
-            kickflip = keyboard.fKey.wasPressedThisFrame;
-            reset = keyboard.rKey.wasPressedThisFrame;
+            bool left = keyboard.aKey.isPressed;
+            bool right = keyboard.dKey.isPressed;
+            bool ollie = keyboard.spaceKey.wasPressedThisFrame;
+            bool kickflip = keyboard.fKey.wasPressedThisFrame;
+            bool shoveIt = keyboard.gKey.wasPressedThisFrame;
+            bool reset = keyboard.rKey.wasPressedThisFrame;
 #else
-    push = Input.GetKey(KeyCode.W);
-    left = Input.GetKey(KeyCode.A);
-    right = Input.GetKey(KeyCode.D);
-    manual = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
-    ollie = Input.GetKeyDown(KeyCode.Space);
-    kickflip = Input.GetKeyDown(KeyCode.F);
-    reset = Input.GetKeyDown(KeyCode.R);
+            bool left = Input.GetKey(KeyCode.A);
+            bool right = Input.GetKey(KeyCode.D);
+            bool ollie = Input.GetKeyDown(KeyCode.Space);
+            bool kickflip = Input.GetKeyDown(KeyCode.F);
+            bool shoveIt = Input.GetKeyDown(KeyCode.G);
+            bool reset = Input.GetKeyDown(KeyCode.R);
 #endif
 
-            float sideInput = 0f;
-            if (left) sideInput -= 1f;
-            if (right) sideInput += 1f;
-
-            board.SetPushInput(push ? 1f : 0f);
-            board.SetSideInput(sideInput);
-            board.SetManual(manual);
+            board.SetSideInput((right ? 1f : 0f) - (left ? 1f : 0f));
 
             if (reset)
+            {
                 board.RequestReset();
-            else if (kickflip)
-                board.RequestKickflip();
-            else if (ollie)
+                return;
+            }
+
+            if (ollie || kickflip || shoveIt)
                 board.RequestOllie();
+
+            if (kickflip)
+                board.RequestKickflip();
+            else if (shoveIt)
+                board.RequestPopShoveIt();
         }
 
-        private void OnDisable() => ReleaseHeldInput();
-
-        private void OnApplicationFocus(bool focused)
+        private void OnDisable()
         {
-            if (!focused) ReleaseHeldInput();
-        }
-
-        private void ReleaseHeldInput()
-        {
-            if (board == null) return;
-
-            board.SetPushInput(0f);
-
-            board.SetSideInput(0f);
-            board.SetManual(false);
-        }
-
-        private void OnGUI()
-        {
-            if (board == null) return;
-
-            GUI.Box(new Rect(12, 12, 345, 62),
-                "W Push   Shift Manual   Space Ollie   F Kickflip   R Reset\n" + board.Status);
+            if (board != null) board.SetSideInput(0f);
         }
     }
 }

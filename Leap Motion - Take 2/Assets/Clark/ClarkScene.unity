@@ -171,11 +171,36 @@ PrefabInstance:
       propertyPath: m_Name
       value: Harbor07_Skatepark
       objectReference: {fileID: 0}
+    - target: {fileID: 7531005385367130070, guid: 04b67b8b45b22d9418cec6d2177eb048, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 8.39
+      objectReference: {fileID: 0}
+    - target: {fileID: 7531005385367130070, guid: 04b67b8b45b22d9418cec6d2177eb048, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 14.85
+      objectReference: {fileID: 0}
+    - target: {fileID: 7531005385367130070, guid: 04b67b8b45b22d9418cec6d2177eb048, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
+    m_RemovedGameObjects:
+    - {fileID: 8000615296227108221, guid: 04b67b8b45b22d9418cec6d2177eb048, type: 3}
+    - {fileID: 8689013966153093845, guid: 04b67b8b45b22d9418cec6d2177eb048, type: 3}
+    m_AddedGameObjects:
+    - targetCorrespondingSourceObject: {fileID: 7531005385367130070, guid: 04b67b8b45b22d9418cec6d2177eb048, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1163925394}
+    - targetCorrespondingSourceObject: {fileID: 7531005385367130070, guid: 04b67b8b45b22d9418cec6d2177eb048, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1838260712}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 04b67b8b45b22d9418cec6d2177eb048, type: 3}
+--- !u!4 &53887060 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 7531005385367130070, guid: 04b67b8b45b22d9418cec6d2177eb048, type: 3}
+  m_PrefabInstance: {fileID: 53887059}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &80420178
 GameObject:
   m_ObjectHideFlags: 0
@@ -284,7 +309,7 @@ GameObject:
   - component: {fileID: 161491408}
   - component: {fileID: 161491412}
   - component: {fileID: 161491414}
-  - component: {fileID: 161491413}
+  - component: {fileID: 161491416}
   - component: {fileID: 161491415}
   m_Layer: 0
   m_Name: Skateboard
@@ -336,18 +361,6 @@ Rigidbody:
   m_Interpolate: 1
   m_Constraints: 112
   m_CollisionDetection: 0
---- !u!114 &161491413
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 161491407}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 25d4f822c8e6181458f8d9ab61dd8d09, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FingerSkate.Starter.SkateboardInput
 --- !u!114 &161491414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -361,16 +374,21 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FingerSkate.Starter.SkateboardController
   boardVisual: {fileID: 1940924988}
-  rearAxle: {x: 0, y: 0.065, z: -0.26}
-  manualAngle: 18
-  slopeFollowSpeed: 16
   maxSpeed: 4
   turnSpeed: 120
-  acceleration: 14
-  coastDeceleration: 2
   jumpSpeed: 3.8
   ollieReadyTime: 0.32
+  slopeFollowSpeed: 16
   kickflipReadyTime: 0.58
+  shoveItTime: 0.4
+  rampSides:
+  - takeoffTrigger: {fileID: 1163925395}
+    landing: {fileID: 1838260712}
+  rampAirHeight: 2.3
+  rampAirDuration: 2
+  followCamera: {fileID: 2075444879}
+  airCamera: {fileID: 1382810321}
+  airCameraOffset: {x: -1.2, y: 1, z: 1.8}
 --- !u!135 &161491415
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -392,6 +410,185 @@ SphereCollider:
   serializedVersion: 3
   m_Radius: 0.13
   m_Center: {x: 0, y: 0.13, z: 0}
+--- !u!114 &161491416
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 161491407}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 25d4f822c8e6181458f8d9ab61dd8d09, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Fingerboard.SkateboardInput
+--- !u!1 &1163925393
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1163925394}
+  - component: {fileID: 1163925395}
+  m_Layer: 0
+  m_Name: TakeOffTrigger
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1163925394
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163925393}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.5, y: -0.5, z: -0.5, w: 0.5}
+  m_LocalPosition: {x: -8.92, y: -7.41, z: 1.82}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 53887060}
+  m_LocalEulerAnglesHint: {x: 0, y: -90, z: -90}
+--- !u!65 &1163925395
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1163925393}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 8, y: 0.5, z: 0.5}
+  m_Center: {x: 0, y: 0, z: 0}
+--- !u!1 &1382810320
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1382810322}
+  - component: {fileID: 1382810321}
+  m_Layer: 0
+  m_Name: AirCamera
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!20 &1382810321
+Camera:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1382810320}
+  m_Enabled: 1
+  serializedVersion: 2
+  m_ClearFlags: 1
+  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_projectionMatrixMode: 1
+  m_GateFitMode: 2
+  m_FOVAxisMode: 0
+  m_Iso: 200
+  m_ShutterSpeed: 0.005
+  m_Aperture: 16
+  m_FocusDistance: 10
+  m_FocalLength: 50
+  m_BladeCount: 5
+  m_Curvature: {x: 2, y: 11}
+  m_BarrelClipping: 0.25
+  m_Anamorphism: 0
+  m_SensorSize: {x: 36, y: 24}
+  m_LensShift: {x: 0, y: 0}
+  m_NormalizedViewPortRect:
+    serializedVersion: 2
+    x: 0
+    y: 0
+    width: 1
+    height: 1
+  near clip plane: 0.3
+  far clip plane: 1000
+  field of view: 60
+  orthographic: 0
+  orthographic size: 5
+  m_Depth: 0
+  m_CullingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  m_RenderingPath: -1
+  m_TargetTexture: {fileID: 0}
+  m_TargetDisplay: 0
+  m_TargetEye: 3
+  m_HDR: 1
+  m_AllowMSAA: 1
+  m_AllowDynamicResolution: 0
+  m_ForceIntoRT: 0
+  m_OcclusionCulling: 1
+  m_StereoConvergence: 10
+  m_StereoSeparation: 0.022
+--- !u!4 &1382810322
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1382810320}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0.2632849, y: -0.37200016, z: 0.11110829, w: -0.88314885}
+  m_LocalPosition: {x: 3.668517, y: 3.197411, z: -15.796167}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1838260711
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1838260712}
+  m_Layer: 0
+  m_Name: Landing
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1838260712
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1838260711}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
+  m_LocalPosition: {x: -8.547, y: -7.78, z: 0.91}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 53887060}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -90}
 --- !u!1001 &1940924987
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -567,5 +764,6 @@ SceneRoots:
   m_Roots:
   - {fileID: 80420180}
   - {fileID: 2075444880}
+  - {fileID: 1382810322}
   - {fileID: 161491408}
   - {fileID: 53887059}

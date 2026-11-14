@@ -63,10 +63,10 @@ public class HandToSkateboardHookup : MonoBehaviour
         }
 
         // set output
-        board.SetPushInput(push ? 1f : 0f);
-        board.SetManual(manual);
-        board.SetSideInput(sideInput);
-        board.isBraced = isBraced;
+        //board.SetPushInput(push ? 1f : 0f);
+        //board.SetManual(manual);
+        //board.SetSideInput(sideInput);
+        //board.isBraced = isBraced;
 
         if (kickflip)
             board.RequestKickflip();
@@ -78,10 +78,10 @@ public class HandToSkateboardHookup : MonoBehaviour
     {
         if (board == null) return;
 
-        board.SetPushInput(0f);
+        //board.SetPushInput(0f);
 
         board.SetSideInput(0f);
-        board.SetManual(false);
+        //board.SetManual(false);
     }
 
     private void OnGUI()

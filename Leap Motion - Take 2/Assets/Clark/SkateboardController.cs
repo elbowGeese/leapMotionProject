@@ -1,76 +1,89 @@
 using UnityEngine;
 
+
 namespace Fingerboard
 {
-    [DisallowMultipleComponent]
     [RequireComponent(typeof(Rigidbody), typeof(SphereCollider))]
     public class SkateboardController : MonoBehaviour
     {
-        // scoring
-        private RoundManager rm;
-        [HideInInspector] public bool isBraced = false;
+        [System.Serializable]
+        private class RampSide
+        {
+            public BoxCollider takeoffTrigger;
+            public Transform landing;
+        }
 
-        public enum State { Grounded, Airborne, Crashed }
-        public enum Trick { None, Ollie, Kickflip }
+        private enum State { Grounded, Airborne, RampAir, Crashed }
+        public enum Trick { None, Kickflip, PopShoveIt }
 
-        [Header("Board Visual")]
+        [Header("Board")]
         [SerializeField] private Transform boardVisual;
-        [SerializeField] private Vector3 rearAxle = new Vector3(0f, 0.065f, -0.26f);
-        [SerializeField] private float manualAngle = 18f;
-        [SerializeField, Min(1f)] private float slopeFollowSpeed = 16f;
-
-        [Header("Movement")]
-        [SerializeField] private float maxSpeed = 4f;
-        [SerializeField, Min(0f)] private float turnSpeed = 120f;
-        [SerializeField] private float acceleration = 14f;
-        [SerializeField] private float coastDeceleration = 2f;
+        [SerializeField, Min(0.1f)] private float maxSpeed = 4f;
+        [SerializeField] private float turnSpeed = 120f;
         [SerializeField] private float jumpSpeed = 3.8f;
         [SerializeField, Min(0.05f)] private float ollieReadyTime = 0.32f;
+        [SerializeField, Min(1f)] private float slopeFollowSpeed = 16f;
         [SerializeField, Min(0.05f)] private float kickflipReadyTime = 0.58f;
+        [SerializeField, Min(0.05f)] private float shoveItTime = 0.4f;
 
-        private const float MinGroundNormalY = 0.65f;
+        [Header("Half-pipe")]
+        [SerializeField] private RampSide[] rampSides;
+        [SerializeField, Min(0.1f)] private float rampAirHeight = 1.2f;
+        [SerializeField, Min(0.2f)] private float rampAirDuration = 1.1f;
+
+        [Header("Optional Cameras")]
+        [SerializeField] private Camera followCamera;
+        [SerializeField] private Camera airCamera;
+        [SerializeField] private Vector3 airCameraOffset = new Vector3(3f, 1.3f, -3f);
+
+        private const float MinGroundY = 0.25f;
         private const float GroundGap = 0.045f;
-        private const float TakeoffGrace = 0.06f;
-        private const float WallCrashSpeed = 1.5f;
-        private const float LandingTime = 0.16f;
 
         private Rigidbody body;
-        private SphereCollider wheelContact;
-        private readonly RaycastHit[] edgeGroundHits = new RaycastHit[12];
+        private SphereCollider contactSphere;
         private Vector3 spawnPosition;
         private Quaternion spawnRotation;
         private Vector3 visualRestPosition;
         private Quaternion visualRestRotation;
-        private Vector3 incomingVelocity;
         private Vector3 groundNormal = Vector3.up;
-        private float groundHeight;
+        private Vector3 contactNormal;
+        private bool hasGroundContact;
+        private Vector3 incomingVelocity;
         private Vector3 visualUp = Vector3.up;
-        private float visualHeight;
-        private float manualTilt;
+        private Vector3 visualOffset;
+        private float turnInput;
 
         private State state;
+        private bool ollieRequested;
+        private bool isOllie;
+        private bool resetRequested;
         private Trick queuedTrick;
         private Trick activeTrick;
         private float airTime;
-        private float landingTimer;
-        private float pushAmount;
-        private float turnInput;
-        private bool manualHeld;
-        private bool resetRequested;
+        private float trickTime;
+        private float deckYaw;
         private string crashReason;
 
-        private float TrickDuration =>
-            activeTrick == Trick.Kickflip ? kickflipReadyTime : ollieReadyTime;
+        private Vector3 rampStart;
+        private Vector3 rampEnd;
+        private Vector3 rampOut;
+        private Vector3 rampLandingNormal;
+        private Quaternion rampStartRotation;
+        private Quaternion rampEndRotation;
+        private Quaternion rampCameraRotation;
+        private float rampPeakY;
+        private float rampTime;
+        private CollisionDetectionMode groundCollisionMode;
 
         public string Status
         {
             get
             {
                 if (state == State.Crashed) return "Crashed: " + crashReason;
-                if (state == State.Airborne)
-                    return activeTrick == Trick.None ? "In the air" : activeTrick.ToString();
-                if (landingTimer > 0f) return "Landed";
-                return manualHeld ? "Manual" : "On ground";
+                if (activeTrick != Trick.None) return activeTrick.ToString();
+                if (state == State.RampAir) return "Half-pipe air";
+                if (state == State.Airborne) return "Airborne";
+                return "Cruising";
             }
         }
 
@@ -87,13 +100,11 @@ namespace Fingerboard
 
         private void Awake()
         {
-            rm = FindAnyObjectByType<RoundManager>();
-
             body = GetComponent<Rigidbody>();
-            wheelContact = GetComponent<SphereCollider>();
+            contactSphere = GetComponent<SphereCollider>();
             spawnPosition = body.position;
             spawnRotation = body.rotation;
-
+            groundCollisionMode = body.collisionDetectionMode;
             body.constraints &= ~RigidbodyConstraints.FreezeRotationY;
             body.constraints |= RigidbodyConstraints.FreezeRotationX |
                                 RigidbodyConstraints.FreezeRotationZ;
@@ -103,23 +114,15 @@ namespace Fingerboard
                 visualRestPosition = boardVisual.localPosition;
                 visualRestRotation = boardVisual.localRotation;
             }
+
+            SetAirCamera(false);
         }
 
-
-
-
-        //Call these from your script!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!//
-        //below//
-        public void SetPushInput(float amount) => pushAmount = Mathf.Clamp01(amount);
         public void SetSideInput(float amount) => turnInput = Mathf.Clamp(amount, -1f, 1f);
-        public void SetManual(bool held) => manualHeld = held;
-        public void RequestOllie() => queuedTrick = Trick.Ollie;
+        public void RequestOllie() => ollieRequested = true;
         public void RequestKickflip() => queuedTrick = Trick.Kickflip;
+        public void RequestPopShoveIt() => queuedTrick = Trick.PopShoveIt;
         public void RequestReset() => resetRequested = true;
-
-
-
-
 
         private void FixedUpdate()
         {
@@ -129,268 +132,343 @@ namespace Fingerboard
                 return;
             }
 
+            bool ollie = ollieRequested;
             Trick requested = queuedTrick;
+            ollieRequested = false;
             queuedTrick = Trick.None;
 
             if (state == State.Crashed) return;
 
-            landingTimer = Mathf.Max(0f, landingTimer - Time.fixedDeltaTime);
-
-            bool hasGround = activeTrick == Trick.None && ReadGround();
-
-            if (state == State.Airborne && hasGround && Velocity.y <= 0.05f)
+            if (state == State.RampAir)
             {
-                state = State.Grounded;
+                UpdateRampAir(requested);
+                return;
             }
 
             if (state == State.Grounded)
             {
-                if (!hasGround)
+                if (!ReadGround())
                 {
-                    BeginAir(Trick.None);
+                    state = State.Airborne;
+                    isOllie = false;
+                    airTime = 0f;
+                    body.angularVelocity = Vector3.zero;
                 }
-                else if (requested != Trick.None)
+                else if (ollie)
                 {
-                    Vector3 alongGround = Vector3.ProjectOnPlane(Velocity, groundNormal);
-                    Velocity = alongGround + Vector3.up * jumpSpeed;
-                    BeginAir(requested);
+                    Vector3 heading = body.rotation * Vector3.forward;
+                    Velocity = heading * maxSpeed + Vector3.up * jumpSpeed;
+                    body.angularVelocity = Vector3.zero;
+                    state = State.Airborne;
+                    isOllie = true;
+                    airTime = 0f;
                 }
                 else
                 {
-                    MoveOnGround();
+                    body.angularVelocity = Vector3.up * (turnInput * turnSpeed * Mathf.Deg2Rad);
+                    Vector3 heading = body.rotation * Vector3.forward;
+                    Velocity = Vector3.ProjectOnPlane(heading, groundNormal).normalized * maxSpeed;
                 }
             }
 
+            hasGroundContact = false;
             if (state == State.Airborne)
+            {
                 airTime += Time.fixedDeltaTime;
+                UpdateTrick(requested, Time.fixedDeltaTime);
+            }
 
             incomingVelocity = Velocity;
-
-            if (body.position.y < spawnPosition.y - 4f)
+            if (body.position.y < spawnPosition.y - 5f)
                 Crash("fell off the track");
         }
 
         private bool ReadGround()
         {
-            Vector3 center = body.position + body.rotation * wheelContact.center;
-            float radius = wheelContact.radius;
-            float rayLength = (radius + GroundGap) / MinGroundNormalY;
-
-            if (Physics.Raycast(center, Vector3.down, out RaycastHit hit, rayLength,
-                    Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore) &&
-                hit.rigidbody != body &&
-                hit.normal.y >= MinGroundNormalY &&
-                hit.distance * hit.normal.y <= radius + GroundGap)
+            if (hasGroundContact)
             {
-                groundNormal = hit.normal;
-                groundHeight = hit.point.y - body.position.y;
+                groundNormal = contactNormal;
                 return true;
             }
 
-            const float minEdgeNormalY = 0.5f;
-            const float probeLift = 0.04f;
-            float probeRadius = radius * 0.95f;
-            float inset = radius - probeRadius;
-            float probeLength = probeLift + (inset + GroundGap) / minEdgeNormalY;
+            Vector3 center = body.position + body.rotation * contactSphere.center;
+            float reach = contactSphere.radius + GroundGap;
 
-            int hitCount = Physics.SphereCastNonAlloc(
-                center + Vector3.up * probeLift, probeRadius, Vector3.down,
-                edgeGroundHits, probeLength, Physics.DefaultRaycastLayers,
-                QueryTriggerInteraction.Ignore);
+            if (!Physics.Raycast(center, Vector3.down, out RaycastHit hit,
+                    reach / MinGroundY, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                return false;
 
-            for (int i = 0; i < hitCount; i++)
-            {
-                RaycastHit edgeHit = edgeGroundHits[i];
+            if (hit.rigidbody == body || hit.normal.y < MinGroundY ||
+                hit.distance * hit.normal.y > reach)
+                return false;
 
-                if (edgeHit.rigidbody == body || edgeHit.distance <= 0f ||
-                    edgeHit.normal.y < minEdgeNormalY)
-                    continue;
-
-                float gap = (edgeHit.distance - probeLift) * edgeHit.normal.y - inset;
-                if (gap > GroundGap) continue;
-
-                groundHeight = center.y - radius / groundNormal.y - body.position.y;
-                return true;
-            }
-
-            return false;
+            groundNormal = hit.normal;
+            return true;
         }
 
-        private void MoveOnGround()
+        private void OnCollisionEnter(Collision collision) => ReadContacts(collision);
+        private void OnCollisionStay(Collision collision) => ReadContacts(collision);
+
+        private void ReadContacts(Collision collision)
         {
-            body.angularVelocity = Vector3.up * (turnInput * turnSpeed * Mathf.Deg2Rad);
-            if (pushAmount <= 0f && groundNormal.y < 0.999f)
-                return;
-
-            Vector3 forward = body.rotation * Vector3.forward;
-            Vector3 right = body.rotation * Vector3.right;
-
-            float forwardSpeed = Vector3.Dot(Velocity, forward);
-            float sidewaysSpeed = Vector3.Dot(Velocity, right);
-            float forwardRate = pushAmount > 0f ? acceleration : coastDeceleration;
-
-            float nextForward = Mathf.MoveTowards(
-                forwardSpeed, maxSpeed * pushAmount, forwardRate * Time.fixedDeltaTime);
-
-            float nextSideways = Mathf.MoveTowards(
-                sidewaysSpeed, 0f, acceleration * Time.fixedDeltaTime);
-
-            Vector3 change = forward * (nextForward - forwardSpeed) +
-                             right * (nextSideways - sidewaysSpeed);
-
-            body.AddForce(Vector3.ProjectOnPlane(change, groundNormal),
-                ForceMode.VelocityChange);
-        }
-
-        private void BeginAir(Trick trick)
-        {
-            body.angularVelocity = Vector3.zero;
-            state = State.Airborne;
-            activeTrick = trick;
-            airTime = 0f;
-            landingTimer = 0f;
-        }
-
-        private void OnCollisionEnter(Collision collision) => CheckCollision(collision);
-        private void OnCollisionStay(Collision collision) => CheckCollision(collision);
-
-        private void CheckCollision(Collision collision)
-        {
-            if (state == State.Crashed) return;
-
-            bool touchedGround = false;
+            if (state == State.RampAir || state == State.Crashed) return;
 
             for (int i = 0; i < collision.contactCount; i++)
             {
-                Vector3 normal = collision.GetContact(i).normal;
-                float speedIntoSurface = -Vector3.Dot(incomingVelocity, normal);
+                ContactPoint contact = collision.GetContact(i);
+                if (contact.thisCollider != contactSphere) continue;
 
-                if (Mathf.Abs(normal.y) < 0.2f && speedIntoSurface >= WallCrashSpeed)
+                Vector3 normal = contact.normal;
+                float impactSpeed = -Vector3.Dot(incomingVelocity, normal);
+
+                if (normal.y < MinGroundY)
                 {
-                    Crash("hit a wall");
-                    return;
+                    if (impactSpeed > 1.5f)
+                    {
+                        Crash("hit a wall");
+                        return;
+                    }
+
+                    continue;
                 }
 
-                if (normal.y >= MinGroundNormalY && speedIntoSurface >= -0.05f)
-                    touchedGround = true;
+                if (!hasGroundContact || normal.y > contactNormal.y)
+                    contactNormal = normal;
+
+                hasGroundContact = true;
+
+                if (state == State.Airborne && airTime >= 0.06f && impactSpeed >= -0.05f)
+                {
+                    groundNormal = normal;
+                    Land();
+                }
             }
+        }
 
-            if (state != State.Airborne || !touchedGround) return;
+        private void OnTriggerEnter(Collider other) => CheckRampLip(other);
+        private void OnTriggerStay(Collider other) => CheckRampLip(other);
 
-            if (activeTrick != Trick.None && airTime < TakeoffGrace) return;
+        private void CheckRampLip(Collider other)
+        {
+            if (state != State.Grounded || rampSides == null || incomingVelocity.y <= 0.15f)
+                return;
 
-            if (activeTrick != Trick.None && airTime < TrickDuration)
+            foreach (RampSide side in rampSides)
             {
-                Crash("landed before the trick finished");
+                if (side == null || side.takeoffTrigger != other || side.landing == null)
+                    continue;
+
+                Transform lip = side.takeoffTrigger.transform;
+                Vector3 uphill = Vector3.ProjectOnPlane(lip.forward, Vector3.up).normalized;
+                if (Vector3.Dot(incomingVelocity, uphill) <= 0.25f) return;
+
+                Vector3 widthAxis = Vector3.Cross(Vector3.up, uphill);
+                Vector3 lipCenter = lip.TransformPoint(side.takeoffTrigger.center);
+                float lane = Vector3.Dot(body.position - lipCenter, widthAxis);
+                float halfWidth = lip.TransformVector(
+                    Vector3.right * side.takeoffTrigger.size.x * 0.5f).magnitude;
+
+                if (Mathf.Abs(lane) > halfWidth) return;
+
+                Vector3 surfacePoint = side.landing.position + widthAxis * lane;
+
+                rampOut = -uphill;
+                rampLandingNormal = side.landing.up;
+                rampEndRotation = Quaternion.LookRotation(rampOut, Vector3.up);
+                rampStartRotation = body.rotation;
+                rampCameraRotation = Quaternion.LookRotation(uphill, Vector3.up);
+
+                rampStart = body.position;
+                rampEnd = surfacePoint + rampLandingNormal * (contactSphere.radius + 0.02f)
+                          - rampEndRotation * contactSphere.center;
+
+                rampPeakY = Mathf.Max(
+                    lipCenter.y + rampAirHeight, rampStart.y + 0.05f, rampEnd.y + 0.05f);
+                rampTime = 0f;
+
+                Velocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+                body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+                body.isKinematic = true;
+                state = State.RampAir;
+                SetAirCamera(true);
+                return;
+            }
+        }
+
+        private void UpdateRampAir(Trick requested)
+        {
+            // Let the final MovePosition finish before restoring physics.
+            if (rampTime >= rampAirDuration)
+            {
+                body.isKinematic = false;
+                body.collisionDetectionMode = groundCollisionMode;
+                groundNormal = rampLandingNormal;
+                contactNormal = rampLandingNormal;
+                hasGroundContact = true;
+                SetAirCamera(false);
+                Land();
+
+                if (state == State.Grounded)
+                    Velocity = Vector3.ProjectOnPlane(rampOut, groundNormal).normalized * maxSpeed;
+
                 return;
             }
 
-            Debug.Log("WAS AIRBORNE NOW GROUNDED");
-            if (rm != null)
+            float step = Mathf.Min(Time.fixedDeltaTime, rampAirDuration - rampTime);
+            rampTime += step;
+            UpdateTrick(requested, step);
+
+            float t = rampTime / rampAirDuration;
+            Vector3 point = Vector3.Lerp(rampStart, rampEnd, t * t);
+
+            if (t < 0.5f)
             {
-                rm.Land(activeTrick, airTime, isBraced);
+                float rise = 1f - 2f * t;
+                point.y = Mathf.Lerp(rampPeakY, rampStart.y, rise * rise);
+            }
+            else
+            {
+                float fall = 2f * t - 1f;
+                point.y = Mathf.Lerp(rampPeakY, rampEnd.y, fall * fall);
+            }
+
+            float turn = Mathf.SmoothStep(0f, 1f, t);
+            body.MovePosition(point);
+            body.MoveRotation(Quaternion.Slerp(rampStartRotation, rampEndRotation, turn));
+        }
+
+        private void UpdateTrick(Trick requested, float step)
+        {
+            if (activeTrick == Trick.None && requested != Trick.None)
+            {
+                activeTrick = requested;
+                trickTime = 0f;
+            }
+
+            if (activeTrick == Trick.None) return;
+
+            trickTime += step;
+            float duration = activeTrick == Trick.Kickflip ? kickflipReadyTime : shoveItTime;
+            if (trickTime < duration) return;
+
+            if (activeTrick == Trick.PopShoveIt)
+                deckYaw = Mathf.Repeat(deckYaw + 180f, 360f);
+
+            activeTrick = Trick.None;
+        }
+
+        private void Land()
+        {
+            if (activeTrick != Trick.None)
+            {
+                Crash("trick unfinished on landing");
+                return;
             }
 
             state = State.Grounded;
-            activeTrick = Trick.None;
-            landingTimer = LandingTime;
-            ReadGround();
         }
 
         private void Crash(string reason)
         {
-            body.angularVelocity = Vector3.zero;
             state = State.Crashed;
             crashReason = reason;
             activeTrick = Trick.None;
-            landingTimer = 0f;
+            body.angularVelocity = Vector3.zero;
             Velocity = new Vector3(0f, Mathf.Min(Velocity.y, 0f), 0f);
         }
 
         private void ResetBoard()
         {
+            if (body.isKinematic)
+            {
+                body.isKinematic = false;
+                body.collisionDetectionMode = groundCollisionMode;
+            }
+
             body.position = spawnPosition;
             body.rotation = spawnRotation;
-            body.angularVelocity = Vector3.zero;
             Velocity = Vector3.zero;
+            body.angularVelocity = Vector3.zero;
             incomingVelocity = Vector3.zero;
-
             state = State.Grounded;
+            groundNormal = Vector3.up;
+            hasGroundContact = false;
+            visualUp = Vector3.up;
+            visualOffset = Vector3.zero;
             activeTrick = Trick.None;
             queuedTrick = Trick.None;
+            isOllie = false;
+            deckYaw = 0f;
+            ollieRequested = false;
             resetRequested = false;
-            crashReason = null;
+            SetAirCamera(false);
+        }
 
-            airTime = 0f;
-            landingTimer = 0f;
-            groundNormal = Vector3.up;
-            groundHeight = 0f;
-            visualUp = Vector3.up;
-            visualHeight = 0f;
-            manualTilt = 0f;
+        private void SetAirCamera(bool useAirCamera)
+        {
+            if (followCamera == null || airCamera == null || airCamera == followCamera) return;
+
+            if (useAirCamera) PlaceAirCamera();
+            followCamera.enabled = !useAirCamera;
+            airCamera.enabled = useAirCamera;
+        }
+
+        private void PlaceAirCamera()
+        {
+            if (airCamera == null) return;
+
+            Vector3 target = transform.position + Vector3.up * 0.2f;
+            Vector3 offset = rampCameraRotation * airCameraOffset;
+
+            if (offset.sqrMagnitude > 0.001f)
+                airCamera.transform.SetPositionAndRotation(
+                    target + offset, Quaternion.LookRotation(-offset, Vector3.up));
         }
 
         private void LateUpdate()
         {
+            if (state == State.RampAir) PlaceAirCamera();
             if (boardVisual == null) return;
 
-            bool grounded = state == State.Grounded;
-            Vector3 targetUp = grounded
-                ? transform.InverseTransformDirection(groundNormal)
-                : Vector3.up;
-
             float blend = 1f - Mathf.Exp(-slopeFollowSpeed * Time.deltaTime);
-            visualUp = Vector3.Slerp(visualUp, targetUp, blend);
-            visualHeight = Mathf.Lerp(visualHeight, grounded ? groundHeight : 0f, blend);
+            Vector3 localUp = Vector3.up;
+            Vector3 offset = Vector3.zero;
 
-            float targetManual = grounded && manualHeld ? manualAngle : 0f;
-            manualTilt = Mathf.MoveTowards(manualTilt, targetManual, 150f * Time.deltaTime);
+            if (state == State.Grounded)
+            {
+                localUp = transform.InverseTransformDirection(groundNormal);
+                offset = contactSphere.center - localUp * contactSphere.radius;
+            }
 
-            Vector3 angles = Vector3.zero;
-            Vector3 pivot = Vector3.zero;
+            visualUp = Vector3.Slerp(visualUp, localUp, blend);
+            visualOffset = Vector3.Lerp(visualOffset, offset, blend);
+
+            float pitch = 0f;
+            if (state == State.Airborne && isOllie)
+                pitch = -25f * Mathf.Sin(Mathf.PI * Mathf.Clamp01(airTime / ollieReadyTime));
+
+            float yaw = deckYaw;
+            float roll = 0f;
             float lift = 0f;
 
-            if (state == State.Crashed)
+            if (activeTrick == Trick.Kickflip)
+                roll = 360f * Mathf.Clamp01(trickTime / kickflipReadyTime);
+            else if (activeTrick == Trick.PopShoveIt)
+                yaw += 180f * Mathf.Clamp01(trickTime / shoveItTime);
+            else if (state == State.Crashed)
             {
-                angles.z = 65f;
-                pivot.y = 0.14f;
+                roll = 65f;
                 lift = 0.08f;
             }
-            else if (state == State.Airborne && activeTrick != Trick.None)
-            {
-                float timeSincePhysics = Mathf.Clamp(
-                    Time.time - Time.fixedTime, 0f, Time.fixedDeltaTime);
 
-                float visualAirTime = airTime - Time.fixedDeltaTime + timeSincePhysics;
-                float progress = Mathf.Clamp01(visualAirTime / TrickDuration);
+            Quaternion slope = Quaternion.FromToRotation(Vector3.up, visualUp);
+            Quaternion trick = Quaternion.Euler(pitch, yaw, roll);
+            Vector3 pivot = Vector3.up * 0.14f;
 
-                angles.x = -25f * Mathf.Sin(progress * Mathf.PI);
-
-                if (activeTrick == Trick.Kickflip)
-                    angles.z = Mathf.SmoothStep(0f, 360f, progress);
-
-                pivot.y = 0.14f;
-            }
-            else if (grounded && landingTimer > 0f)
-            {
-                float progress = 1f - landingTimer / LandingTime;
-                angles.x = 7f * Mathf.Sin(progress * Mathf.PI);
-            }
-            else if (grounded)
-            {
-                angles.x = -manualTilt;
-                pivot = rearAxle;
-            }
-
-            Quaternion slopeRotation = Quaternion.FromToRotation(Vector3.up, visualUp);
-            Quaternion trickRotation = Quaternion.Euler(angles);
-            Vector3 posePosition = pivot + trickRotation * (visualRestPosition - pivot);
-
-            boardVisual.localPosition =
-                slopeRotation * posePosition + Vector3.up * (visualHeight + lift);
-
-            boardVisual.localRotation =
-                slopeRotation * trickRotation * visualRestRotation;
+            boardVisual.localPosition = visualOffset + Vector3.up * lift +
+                                        slope * (pivot + trick * (visualRestPosition - pivot));
+            boardVisual.localRotation = slope * trick * visualRestRotation;
         }
     }
 }
