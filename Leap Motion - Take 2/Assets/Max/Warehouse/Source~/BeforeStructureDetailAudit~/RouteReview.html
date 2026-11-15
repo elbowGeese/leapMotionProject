@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Warehouse · 起点比例与逐帧对照 V5</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#151a20;color:#e7edf2;font:16px/1.75 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1180px;margin:auto;padding:36px 24px 70px}h1{font-size:32px;line-height:1.35}h2{font-size:24px;margin-top:46px}h3{font-size:20px}p{max-width:1060px}a{color:#8ed2ff}.eyebrow{color:#efbb7c;font-size:13px;letter-spacing:2px}.notice{border-left:4px solid #e8b875;background:#302b23;padding:16px 22px}.muted,figcaption{color:#afbdc9;font-size:14px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px}figure{margin:0;min-width:0}figcaption{padding:10px 0}.frame{aspect-ratio:.88;position:relative;overflow:hidden;background:#050a0e}.frame img{display:block;width:100%}.frame.ref img{width:200%;max-width:none}.frame.ref.videoHeader img{position:absolute;top:-9.6%}.comparison{max-width:600px;margin:auto}.overlay{position:absolute;inset:0;opacity:.5}.overlay img{width:200%;max-width:none}.controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0}button,select{font:inherit;padding:7px 12px;background:#283845;color:#e7edf2;border:1px solid #557080;border-radius:6px}input[type=range]{flex:1;min-width:150px;accent-color:#efbb7c}button{cursor:pointer}button:hover{background:#3b5261}nav{display:flex;gap:12px;flex-wrap:wrap}nav a{background:#24333e;padding:6px 14px;border-radius:6px}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:12px;border-bottom:1px solid #40505c;text-align:left;vertical-align:top}th{background:#24333e}.wide{width:100%;display:block}code{color:#ecc592}details{background:#202b35;padding:14px 20px;margin-top:24px}summary{cursor:pointer}section{scroll-margin-top:20px}@media(max-width:680px){main{padding:22px 14px}.pair{gap:10px}h1{font-size:25px}th,td{padding:7px}table{font-size:12px}}
+</style></head><body><main>
+<p class="eyebrow">WAREHOUSE / PROPORTION AUDIT / V5</p>
+<h1>先对准橙衣玩家起点，再沿路线检查比例</h1>
+<p class="notice"><b>“东西有了，但场地太宽”的判断是对的。</b>这轮同时修正场景尺寸和相机：缩窄大厅与南端前坡，重新安排双跳台、北端高坡和扶手拐弯，降低半管与金属通道的高度，并调整斜射日光。起点和接近端墙的构图更接近了；掉头后的半管外坡、办公室遮挡和部分窗格仍有明显差异，不能称为完全复刻。</p>
+<nav><a href="#start">1:32 起点</a><a href="#overlay">叠图 / 旧版</a><a href="#route">逐张路线</a><a href="#changes">尺寸调整</a><a href="#verification">验证与限制</a></nav>
+<p>主相机已设为 <code>Main Camera - P1 start 0132</code>，Game 视图使用 <b>880 × 1000</b>，对应视频左半屏。以下 Unity 图都来自同一份保存场景，统一垂直视场角 64°；按时间改变相机位置和朝向，没有为每张图单独拉伸设施。时间点依据用户截图及浏览器暂停观察，未恢复原游戏的逐帧跟随相机数据。</p>
+
+<section id="start"><h2>1:32 · 橙衣玩家起点</h2>
+<p>玩家在沟槽西侧，朝南端凹入平台。画面从左到右是高坡开间、UBS 前坡、双门低台；红扶手在左前方，双跳台在右前方。相机位于玩家身后，位置约 <code>(-11.34, 1.96, 10.30)</code>，俯角 13.77°、朝向 166.67°。</p>
+<div class="pair"><figure><div class="frame ref"><img src="Source~/References/17_RecessFront_0132.png" alt="1分32秒原图左半屏"></div><figcaption>视频参考 · 左半屏，保留人物、字幕和界面遮挡</figcaption></figure><figure><div class="frame"><img src="Previews/07_P1_Start_0132.png" alt="本轮调整后的橙衣玩家起点视角"></div><figcaption>当前 Unity 场景 · 前坡宽度、厂牌位置与远端扶手已重新对齐</figcaption></figure></div>
+<p class="muted">仍不同：铁笼遮挡厂牌左边，双门及周围墙面细节不足，地面杂物和光斑分布不同。没有添加玩家，所以原图中被人物遮住的区域在 Unity 图里可见。</p></section>
+
+<section id="overlay"><h2>叠图查看，也可以切回修改前</h2>
+<p>把参考透明度调到 0 看 Unity，调到 100 看视频；中间值用于看边缘偏移。这里只裁出原图左半屏并按相同比例显示，没有对局部建筑做图像变形。</p>
+<div class="comparison"><div class="controls"><label for="version">Unity 版本</label><select id="version"><option value="Previews/07_P1_Start_0132.png">当前 V5</option><option value="Source~/BeforeProportionAudit~/Previews/07_P1_Start_0132.png">修改前 V4</option></select></div>
+<div class="frame"><img id="unityImage" src="Previews/07_P1_Start_0132.png" alt="可切换的新旧Unity起点图"><div id="referenceLayer" class="overlay"><img src="Source~/References/17_RecessFront_0132.png" alt="视频起点叠加层"></div></div>
+<div class="controls"><label for="opacity">参考透明度</label><input id="opacity" type="range" min="0" max="100" value="50"><output id="amount" for="opacity">50%</output><button id="onlyUnity">只看 Unity</button><button id="onlyReference">只看参考</button></div></div>
+<details><summary>起点的量化核对：7 个手工选取的结构点</summary>
+<p>选取前坡两端唇口、右端坡脚、厂牌三个角和扶手远端。统一到 880 × 1000 后，投影点均方根距离由约 <b>117.9 px</b> 降到 <b>8.7 px</b>。这是用于调参的同一张图上的误差，不能代表全图相似度，也不能代表其他视角达到这个精度。原图点位由目测选取，边缘遮挡会带来误差。</p>
+<p><a href="Source~/ProportionAnchors.csv">逐点参考与投影坐标</a> · <a href="Source~/ProportionCameraPoses.csv">已保存相机位置与朝向</a></p></details></section>
+
+<section id="route"><h2>按橙衣玩家行进顺序，一张一张看</h2>
+<p>前两张后续视角也用于检查前坡、厂牌与双门的透视关系；后续转身和腾空镜头仍只是估计机位。每一行都写明已经改了什么、还差在哪里。</p>
+<div id="routePairs"></div></section>
+
+<h2>反向看金属通道与办公室</h2>
+<p>金属通道在半管中央沿东西向贯通，办公室位于东端上方。灰色区域现在包含两侧平板与中央格栅，而不只是原来的窄格栅。下面是结构检查视角，不作为与 2:19 精确同机位的证据。</p>
+<div class="pair"><figure><div class="frame"><img src="Previews/10_ChannelWest_0152.png" alt="金属通道向西看大厅"></div><figcaption>向西 · 木坡之间的低灰色通道</figcaption></figure><figure><div class="frame"><img src="Previews/11_ChannelOffice_0219.png" alt="金属通道东端上方的办公室"></div><figcaption>向东 · 办公室、支架和半管端部的上下关系</figcaption></figure></div>
+
+<section id="changes"><h2>这次改的是实际几何，不只有镜头</h2>
+<table><thead><tr><th>部分</th><th>已保存的变化</th><th>依据与剩余限制</th></tr></thead><tbody>
+<tr><td>大厅与南端开间</td><td>大厅 X 向缩为原来的 82%，主厅约 45.92 × 42 m；UBS 前坡跨度从 22 m 调至约 12.17 m，高 2.35 m；后方平台与开间边界同步调整。</td><td>起点参考中前坡比旧版窄得多，而厂牌宽度本来较接近，因此不能只统一改 FOV。所有米制尺寸都是重建估值。</td></tr>
+<tr><td>厂牌与高坡</td><td>南端厂牌中心降至约 9.30 m；独立高坡升至约 7.5 m；南端两翼改为主要实墙，双门位置重新排列。</td><td>1:32–1:35 的端墙轮廓；窗格、铁笼和门的造型未完全一致。</td></tr>
+<tr><td>双跳台与沟槽</td><td>双跳台整体向南移 8 m、向西移约 1.8 m；跨度调至约 6.23 m；红扶手高调至 1.20 m。</td><td>使跳台在起点画面里更远、更小。扶手北端横向拐弯已改为朝东。</td></tr>
+<tr><td>北端箱子高坡</td><td>高坡、箱子和铁笼向东移；高唇两侧增加逐渐降低的过渡，接回连续低坡。</td><td>1:39 的扶手尽头与箱子高坡关系。轮廓仍是近似重建。</td></tr>
+<tr><td>半管与金属通道</td><td>木坡高约 2.59 m，金属坡顶约 1.18 m；灰色开口宽 5.2 m，中央格栅宽 2.8 m。</td><td>按 1:38、1:52 的高低关系降低。外坡侧面形状、倾角和与沟槽间距仍需继续细化。</td></tr>
+<tr><td>日光</td><td>调整为西侧斜射，降低太阳高度；起点地面出现横跨画面的窗格阴影，南端端墙相对更暗。</td><td>方向更接近参考，光斑形状、曝光、体积光和材质响应仍不同。</td></tr>
+</tbody></table></section>
+
+<section id="verification"><h2>保存、验证和当前边界</h2>
+<p>已重新打开保存场景，检查 79 个网格、43 个静态碰撞体、70 个弧坡采样点、243 个金属带支撑采样点和 6 处平台支撑点。原有场景 <code>Assets/Max/MaxScene.unity</code> 未替换。完整输出见 <a href="validation.txt">验证记录</a>。</p>
+<p>当前场景为 <code>Assets/Max/WarehouseRecreation.unity</code>。Hierarchy 中有主相机、9 个按时间命名的停用检查相机，以及 <code>Video route anchors - estimated poses</code> 起点/路线标记。所有机位都能在场景中直接检查。</p>
+<p class="notice">这轮完成的是比例和构图的一次实质校正，尚非 1:1 还原。最明确的剩余差异是：掉头后半管外坡的轮廓和距离、1:46 办公室遮挡、部分窗格与开间比例，以及墙面材质和灯光细节。没有恢复真实滑板轨迹，也没有测试滑板或 Leap Motion 控制器手感。</p>
+<p class="muted">本轮修改前完整备份位于 <code>Source~/BeforeProportionAudit~</code>。上轮的方向/拓扑观察记录仍保留在 <a href="Source~/RouteFrameAudit.csv">RouteFrameAudit.csv</a>；旧比例以本页 V5 为准。生成器为 <code>Source~/WarehouseBuilder.cs</code>；直接重跑会覆盖生成场景和生成网格，手工调整前请另存版本。</p>
+</section>
+<script>
+const route=[
+["1:33","13_P1_Approach_0133.png","01_Approach_0133.png","接近端墙，视角稍向右","厂牌移到画面左上、前坡右端落在中部；双门和跳台退到合适的前后层次。地面光斑仍比参考密，门的外形与墙面明暗还不一致。"],
+["1:35","14_P1_Entry_0135.png","18_FrontQuarter_0135.png","到达 UBS 前坡","前坡唇口与坡脚高度已按这一帧复看；后方平台、后坡和厂牌依然是同一组几何。木板分缝与涂鸦细节不同。"],
+["1:38","15_P1_Return_0138.png","03_Return_0138.png","掉头，看回中央沟槽和半管","已经降低半管并收紧大厅，但半管外侧坡面在当前画面里仍偏突出；这一帧不能判为已经对齐。跟随相机转身角度也有不确定性。"],
+["1:39","16_P1_Rail_0139.png","04_TrenchAndExtension.png","沿红扶手接近北端高坡","修正了扶手尽头拐弯方向，并将箱子高坡移近沟槽轴线。原图的施工挡板、弧坡肩部及人物遮挡仍与重建不同。"],
+["1:46","12_OfficePipe_0146.png","06_Pipe_0146.png","东墙红管与半管上方","通行关系保留；当前办公室占据画面过多，说明这里的镜头位置、办公室悬挑深度或高度仍需进一步标定。本行明确保留差异，不把它算作匹配完成。"],
+["1:52","10_ChannelWest_0152.png","09_ChannelAndKicker.png","从半管金属通道向西看","扩大中央灰色开口、降低金属坡顶与两侧木坡。原图两侧红色为 Graffiti 占领色，重建保留木色；通道倾角、格栅分段与跟随镜头仍有差异。"]
+];
+document.getElementById("routePairs").innerHTML=route.map(([time,render,ref,title,note])=>'<section><h3>'+time+' · '+title+'</h3><div class="pair"><figure><div class="frame ref '+(time==="1:46"?"videoHeader":"")+'"><img src="Source~/References/'+ref+'" alt="'+time+'视频参考左半屏" loading="lazy"></div><figcaption>原图左屏 · '+time+(time==="1:46"?'；网页裁去顶部 YouTube 页头':'')+'</figcaption></figure><figure><div class="frame"><img src="Previews/'+render+'" alt="'+time+'重建对照视角" loading="lazy"></div><figcaption>Unity · 对应路线节点的估计视角</figcaption></figure></div><p>'+note+'</p></section>').join('');
+const slider=document.getElementById("opacity"),layer=document.getElementById("referenceLayer"),amount=document.getElementById("amount");
+function opacity(value){slider.value=value;layer.style.opacity=value/100;amount.value=value+"%";}
+slider.addEventListener("input",()=>opacity(slider.value));
+document.getElementById("onlyUnity").addEventListener("click",()=>opacity(0));
+document.getElementById("onlyReference").addEventListener("click",()=>opacity(100));
+document.getElementById("version").addEventListener("change",event=>document.getElementById("unityImage").src=event.target.value);
+</script></main></body></html>

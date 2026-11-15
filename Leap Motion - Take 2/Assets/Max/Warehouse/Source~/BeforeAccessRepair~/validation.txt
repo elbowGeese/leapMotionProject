@@ -1,0 +1,8 @@
+PASS: saved scene reopened; 112 original manual transforms preserved.
+PASS: 79 finite valid meshes; 109219 triangles; supported restored materials.
+PASS: 366 joined wood-ramp/floor samples; 264 straight transverse entry/drain samples.
+PASS: old floor opening filled; north duplicated quarters trimmed; rounded bump shoulders join neighbours.
+PASS: identical tall roll-in profiles; transverse window wall at pier front; route clear behind.
+PASS: reference-shaped platform, surrounding bank, hidden reference cubes and fitted kicker frames.
+PASS: orphan pit decoration and old floating crate colliders removed; moved office reaches roof.
+Limit: geometry/placement checks and rendered inspection, not full video camera matching or actual skating/Leap Motion testing.

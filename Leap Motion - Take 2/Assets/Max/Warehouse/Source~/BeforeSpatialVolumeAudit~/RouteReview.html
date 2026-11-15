@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Warehouse · 三处结构纠正 V6</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#151a20;color:#e7edf2;font:16px/1.75 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1180px;margin:auto;padding:36px 24px 70px}h1{font-size:32px;line-height:1.35}h2{font-size:24px;margin-top:46px}h3{font-size:20px}a{color:#8ed2ff}.eyebrow{color:#efbb7c;font-size:13px;letter-spacing:2px}.notice{border-left:4px solid #e8b875;background:#302b23;padding:16px 22px}.muted,figcaption{color:#afbdc9;font-size:14px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px}figure{margin:0;min-width:0}figcaption{padding:10px 0}.frame{aspect-ratio:.88;position:relative;overflow:hidden;background:#050a0e}.frame img{display:block;width:100%}.frame.ref img{width:200%;max-width:none}.comparison{max-width:580px;margin:auto}.overlay{position:absolute;inset:0;opacity:.5}.overlay img{width:200%;max-width:none}.controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:14px 0}button,select{font:inherit;padding:7px 12px;background:#283845;color:#e7edf2;border:1px solid #557080;border-radius:6px}input[type=range]{flex:1;min-width:150px;accent-color:#efbb7c}button{cursor:pointer}nav{display:flex;gap:12px;flex-wrap:wrap}nav a{background:#24333e;padding:6px 14px;border-radius:6px}table{width:100%;border-collapse:collapse;font-size:14px}th,td{padding:12px;border-bottom:1px solid #40505c;text-align:left;vertical-align:top}th{background:#24333e}.wide{width:100%;display:block}code{color:#ecc592}details{background:#202b35;padding:14px 20px;margin-top:24px}summary{cursor:pointer}section{scroll-margin-top:20px}@media(max-width:680px){main{padding:22px 14px}.pair{gap:10px}h1{font-size:25px}th,td{padding:7px}}
+</style></head><body><main>
+<p class="eyebrow">WAREHOUSE / STRUCTURE DETAIL AUDIT / V6</p>
+<h1>凸出的门台建筑、平平台与通道两旁的坡面</h1>
+<p class="notice">V5 的起点少量结构点对齐，并没有覆盖右侧建筑和半管，不能据此判断全场已经一致。本轮按新指出的三处问题直接改了模型：补出凸出的门台建筑；恢复扶手前方与右侧的平地及北端平顶平台；重做金属通道向外展开的出口和两侧曲坡。</p>
+<nav><a href="#loading">① 凸出建筑</a><a href="#north">② 平平台与平地</a><a href="#channel">③ 通道两侧坡</a><a href="#overlay">叠图 / V5 对比</a><a href="#route">其他路线截图</a><a href="#checks">保存与验证</a></nav>
+
+<section id="loading"><h2>① 1:33 · 门台是一段伸入大厅的建筑</h2>
+<p>旧模型把门贴在一面平墙上，侧面没有表现出来。现在正面向大厅突出约 2.2 m，左侧向后连接厂牌开间，补上两层窗、立柱和下部橙色栏栅；正面有两扇门、门灯、低平台与三级踏步。<b>这一组相机与 V5 的 1:33 相机相同。</b></p>
+<div class="pair"><figure><div class="frame ref"><img src="Source~/References/01_Approach_0133.png" alt="视频1分33秒左屏，突出建筑侧面窗户、橙色栏栅与正面双门"></div><figcaption>视频参考 · 观察右侧建筑的转角、窗与门台</figcaption></figure><figure><div class="frame"><img src="Previews/13_P1_Approach_0133.png" alt="V6同机位，突出建筑、侧面窗与双门"></div><figcaption>V6 · 保留原机位，修改真实建筑体量</figcaption></figure></div>
+<p class="muted">下面用独立近景展示新增几何，方便检查侧面，不作为同机位匹配证据。</p>
+<img class="wide" src="Previews/18_LoadingProjection.png" alt="近景显示凸出建筑侧面的两层窗、柱子、橙色栏栅和正面门台台阶">
+<p class="muted">门窗细节、橙色栏栅的密度和侧面露出宽度仍有差异；建筑尺寸属于截图推断值。</p></section>
+
+<section id="north"><h2>② 1:39 · 平顶高台，扶手前后留出平地</h2>
+<p>原来的高台顶边是宽缓的隆起，已经改为有明确水平顶面的局部高台，并保留两侧接回低弧坡的过渡。补宽左侧窗区，让铁笼位于窗区边缘。半管南北向占地由约 19.8 m 缩至 13.46 m，向东收进；扶手正前方放错的破损小台也移到了后场偏右。<b>相机位置和角度与 V5 的 1:39 相同。</b></p>
+<div class="pair"><figure><div class="frame ref"><img src="Source~/References/04_TrenchAndExtension.png" alt="视频1分39秒左屏，扶手前方平地和北端高平台"></div><figcaption>视频参考 · 扶手尽头、平地和高台</figcaption></figure><figure><div class="frame"><img src="Previews/16_P1_Rail_0139.png" alt="V6扶手前方平地与平顶高台，右侧错误大斜坡已移出视野"></div><figcaption>V6 · 移走错误占地，恢复前方与右侧通道</figcaption></figure></div>
+<p class="muted">高台宽度、箱子摆位和施工挡板还不是逐像素一致；顶部水平和开放地面的几何、碰撞已经单独检查。</p></section>
+
+<section id="channel"><h2>③ 1:52 · 灰色通道向坡顶展开，两侧曲坡伸入前景</h2>
+<p>此前是等宽的窄开口，曲坡也太短，红色坡面的侧边轮廓没有做出来。现已把木坡的弧段加长，中央灰色开口由底部约 3.54 m 展开到坡顶约 7 m，中央格栅保持约 1.90 m 宽。两侧木坡顶约 3.11 m，金属顶约 1.72 m。</p>
+<div class="pair"><figure><div class="frame ref"><img src="Source~/References/09_ChannelAndKicker.png" alt="视频1分52秒左屏，展开的灰色通道与红色两侧坡"></div><figcaption>视频参考 · 红色是这一时刻的 Graffiti 占领状态</figcaption></figure><figure><div class="frame"><img src="Previews/17_ChannelWest_0152_Tagged.png" alt="V6展开的通道和两侧曲坡，使用红色参考状态"></div><figcaption>V6 实际模型渲染 · 临时切换红色材质作轮廓对照</figcaption></figure></div>
+<p>这里的镜头随新通道位置调整为略偏一侧的朝向，以对应原图斜着看向出口的视角；没有拉伸渲染图片。红色只用于这张对照渲染，基础场景仍保留 1:32 时的木色。两张图使用同一网格，<a href="Previews/10_ChannelWest_0152.png">查看木色版本</a>。</p>
+<p class="muted">展开宽度和曲率仍是根据截图估计；前景红坡轮廓、格栅分段与镜头尚有偏差。未实现动态占领玩法。</p></section>
+
+<section id="overlay"><h2>门台同机位叠图：V5 / V6</h2>
+<p>0% 看 Unity，100% 看参考，中间值查看边缘错位。参考只裁出左半屏；原图人物和字幕仍保留。</p>
+<div class="comparison"><div class="controls"><label for="version">Unity 版本</label><select id="version"><option value="Previews/13_P1_Approach_0133.png">当前 V6</option><option value="Source~/BeforeStructureDetailAudit~/Previews/13_P1_Approach_0133.png">修改前 V5</option></select></div>
+<div class="frame"><img id="unityImage" src="Previews/13_P1_Approach_0133.png" alt="可切换的V5与V6同机位画面"><div id="referenceLayer" class="overlay"><img src="Source~/References/01_Approach_0133.png" alt="原图1分33秒左半屏叠加层"></div></div>
+<div class="controls"><label for="opacity">参考透明度</label><input id="opacity" type="range" min="0" max="100" value="50"><output id="amount" for="opacity">50%</output><button id="onlyUnity">只看 Unity</button><button id="onlyReference">只看参考</button></div></div></section>
+
+<section id="route"><h2>同一份场景的其他路线截图</h2>
+<p>主相机仍是橙衣玩家起点，Game View 使用 880 × 1000。1:32、1:33、1:35、1:38、1:39 的相机沿用 V5；金属通道机位随结构更新。没有为不同机位分别摆放模型。</p>
+<div class="pair"><figure><div class="frame"><img src="Previews/07_P1_Start_0132.png" alt="V6橙衣玩家起点" loading="lazy"></div><figcaption>1:32 · 主相机起点</figcaption></figure><figure><div class="frame"><img src="Previews/14_P1_Entry_0135.png" alt="V6接近前坡" loading="lazy"></div><figcaption>1:35 · 接近 UBS 前坡</figcaption></figure></div>
+<div class="pair"><figure><div class="frame"><img src="Previews/15_P1_Return_0138.png" alt="V6掉头看回大厅" loading="lazy"></div><figcaption>1:38 · 掉头看回大厅</figcaption></figure><figure><div class="frame"><img src="Previews/11_ChannelOffice_0219.png" alt="V6沿金属通道向东看办公室" loading="lazy"></div><figcaption>反向检查 · 办公室在通道东端上方</figcaption></figure></div>
+<p><a href="Previews/12_OfficePipe_0146.png">东墙红管机位</a> · <a href="Previews/08_P2_Start_0132.png">第二名玩家起点</a> · <a href="Previews/01_ReferenceOverview.png">全场总览</a> · <a href="Previews/04_LayoutTop.png">俯视结构</a> · <a href="Source~/ProportionCameraPoses.csv">相机坐标</a></p></section>
+
+<section id="checks"><h2>保存与验证</h2>
+<table><thead><tr><th>检查</th><th>结果</th></tr></thead><tbody>
+<tr><td>场景保存 / 重开</td><td>82 个网格、107358 个三角形、45 个静态碰撞体；材质和引用完整。</td></tr>
+<tr><td>新增门台建筑</td><td>正面突出位置、侧面立柱和三级踏步支撑检查通过。</td></tr>
+<tr><td>高台 / 开放地面</td><td>4 处水平顶面采样，3 处扶手前方及右侧地面采样通过。</td></tr>
+<tr><td>弧坡 / 通道</td><td>70 处弧面采样、243 处连续通道支撑、5 处展开坡顶横向支撑通过。</td></tr>
+<tr><td>红色参考状态</td><td>对照渲染后恢复材质；保存场景未残留临时红色覆盖。</td></tr>
+</tbody></table>
+<p><a href="validation.txt">完整验证输出</a>。这些是几何有效性检查，不是图像相似度认证。窗格、污渍、涂鸦、杂物、灯光和若干距离仍不等同原作；未测试滑板或 Leap Motion 操控手感。</p>
+<p class="muted">场景：<code>Assets/Max/WarehouseRecreation.unity</code>。原 <code>Assets/Max/MaxScene.unity</code> 未替换。本轮修改前备份：<code>Source~/BeforeStructureDetailAudit~</code>。上一轮报告及全部旧预览在备份中保留。生成器会覆盖生成资产，手工调整前请另存。</p>
+</section>
+<script>
+const slider=document.getElementById("opacity"),layer=document.getElementById("referenceLayer"),amount=document.getElementById("amount");
+function opacity(value){slider.value=value;layer.style.opacity=value/100;amount.value=value+"%";}
+slider.addEventListener("input",()=>opacity(slider.value));
+document.getElementById("onlyUnity").addEventListener("click",()=>opacity(0));
+document.getElementById("onlyReference").addEventListener("click",()=>opacity(100));
+document.getElementById("version").addEventListener("change",event=>document.getElementById("unityImage").src=event.target.value);
+</script></main></body></html>

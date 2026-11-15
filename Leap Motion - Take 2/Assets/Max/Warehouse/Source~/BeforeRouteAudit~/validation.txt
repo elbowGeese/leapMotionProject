@@ -1,0 +1,8 @@
+PASS: saved scene reopened successfully; all meshes and materials persisted.
+PASS: 60 curved-ramp normal/collider samples; floor coverage; open service trench.
+PASS: 6 platform support points, clear recess entrances, north facade setback.
+PASS: halfpipe and entry channel geometry regression (not a reference-match certification).
+PASS: non-degenerate triangles, unit normals, graffiti atlas UV persistence.
+PASS: scene assets are self-contained under Assets/Max/Warehouse.
+Meshes: 71; vertices: 246554; triangles: 121772; static colliders: 39.
+Not checked: skateboard/Leap Motion controller feel or original game's exact dimensions. Recess dimensions are estimated. Metal-channel placement needs renewed camera/topology calibration; this check only verifies existing geometry.

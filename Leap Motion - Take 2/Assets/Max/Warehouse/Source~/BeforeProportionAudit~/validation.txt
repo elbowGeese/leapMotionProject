@@ -1,0 +1,10 @@
+PASS: saved scene reopened successfully; all meshes and materials persisted.
+PASS: 70 curved-ramp normal/collider samples; floor coverage; open service trench.
+PASS: 6 platform support points, clear recess entrances, SOUTH facade setback.
+PASS: 243 metal-strip support samples across the halfpipe; east-west riding direction; office above east end.
+PASS: two opposite factory signs; both start markers have reference-consistent left/right landmarks.
+PASS: non-degenerate triangles, unit normals, graffiti atlas UV persistence.
+PASS: scene assets are self-contained under Assets/Max/Warehouse.
+Meshes: 79; vertices: 231870; triangles: 114390; static colliders: 43.
+These are saved-geometry regression checks, not a pixel-match certification. Camera poses and all metre dimensions are estimates.
+Not checked: skateboard/Leap Motion controller feel, exact original dimensions, production lighting.

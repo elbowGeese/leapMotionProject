@@ -1,0 +1,10 @@
+PASS: saved scene reopened; finite meshes, valid normals, non-degenerate triangles and supported materials.
+PASS: two mirrored tall roll-ins, two outer double-tier assemblies, projecting central pier and open upper cross-link.
+PASS: north wall centre pier projects into hall.
+PASS: 50 curved-surface collider/normal samples.
+PASS: four inner curves with matching outer faces along north-south direction; centre floor is truly below hall.
+PASS: 210 entry-channel samples, both small descending ramps, no hidden original slab.
+PASS: office floor, loading dock/stairs, north convex deck and central service trench preserved.
+PASS: temporary red/blue materials restored; saved scene dependencies self-contained.
+Meshes: 79; vertices: 216806; triangles: 106672; colliders: 47.
+Dimensions remain visual estimates. These tests verify topology and support, not pixel matching or skateboard/Leap Motion control.

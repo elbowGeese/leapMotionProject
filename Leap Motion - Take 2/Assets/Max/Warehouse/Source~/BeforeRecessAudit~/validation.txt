@@ -1,0 +1,7 @@
+PASS: saved scene reopened successfully; all meshes and materials persisted.
+PASS: 50 curved-ramp normal/collider samples; floor coverage; open service trench.
+PASS: continuous halfpipe perpendicular to rail; metal channels at entrance.
+PASS: non-degenerate triangles, unit normals, graffiti atlas UV persistence.
+PASS: scene assets are self-contained under Assets/Max/Warehouse.
+Meshes: 65; vertices: 228178; triangles: 112608; static colliders: 31.
+Not checked: skateboard/Leap Motion controller feel or original game's exact dimensions. Layout audit does not establish an exact reference match.
