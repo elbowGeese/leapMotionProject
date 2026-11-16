@@ -1,0 +1,23 @@
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Warehouse · 坡道侧面与沟槽 V13</title><style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#151a20;color:#e7edf2;font:16px/1.8 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1280px;margin:auto;padding:30px 24px 70px}h1{font-size:32px}h2{margin-top:42px}a{color:#9ad9ff}.note{background:#253129;border-left:4px solid #86b69b;padding:16px 22px}.pair{display:grid;grid-template-columns:1fr 1fr;gap:18px}figure{margin:0;min-width:0}img{width:100%;display:block;background:#080b0e}figcaption,.muted{font-size:14px;color:#bcc8d0}figcaption{padding:8px 0}nav{display:flex;gap:16px;flex-wrap:wrap}table{border-collapse:collapse;width:100%}td,th{padding:12px;border-bottom:1px solid #44515a;text-align:left}code{background:#29323a;padding:2px 5px}@media(max-width:700px){main{padding:20px 12px}.pair{grid-template-columns:1fr}}
+</style></head><body><main><p class="muted">WAREHOUSE / RAMP SIDES AND CENTRAL TRENCH / V13</p>
+<h1>坡道侧面补齐，中央红杆降低，沟槽加深</h1>
+<p class="note">以本轮开始时保存的手动布局为准，134 个原有对象的位置、旋转和缩放逐一核对保留。修改局部网格、碰撞和沟槽内部结构。</p>
+<h2>中央红杆与沟槽：同机位前后</h2>
+<div class="pair"><figure><img src="Source~/BeforeTrenchSideRepair~/Previews/02_CentralRail.png" alt="本轮修改前的中央栏杆沟槽"><figcaption>修改前：红杆偏高，格栅和沟底较浅。</figcaption></figure><figure><img src="Previews/02_CentralRail.png" alt="修改后的中央栏杆沟槽"><figcaption>修改后：红杆降低，下凹轮廓加深，沟槽两端和侧壁完整。</figcaption></figure></div>
+<img src="Previews/45_CentralTrenchV13.png" alt="降低后的中央红杆与下凹地板">
+<p>红杆顶部由约 1.29 m 降至约 0.85 m；平面位置和转弯方向保留。格栅下沉约 0.70 m，沟底为 -1.05 m；四周补齐混凝土壁和端面。沟口两边大厅地面保持原高度。</p>
+<img src="Previews/46_TrenchDepthV13.png" alt="低机位查看沟槽壁与格栅">
+<h2>坡道侧板与端面</h2>
+<div class="pair"><figure><img src="Source~/BeforeTrenchSideRepair~/Previews/34_ManualPitSide.png" alt="补面前的坡道"><figcaption>修改前。</figcaption></figure><figure><img src="Previews/34_ManualPitSide.png" alt="补面后的坡道"><figcaption>修改后：侧板朝向修正，端部补封面。</figcaption></figure></div>
+<img src="Previews/47_RampSidesV13.png" alt="木坡侧板和端面近景">
+<p>修正 634 个朝内的木质侧面三角形，补上 10 处坡道端面并同步碰撞。检查覆盖 1876 个垂直木侧面三角形；骑行面和金属包边保持原形。</p>
+<h2>验证和回退</h2><ul>
+<li>保存后重开场景，134 个原有变换与本轮手动基准一致。</li>
+<li>196 处沟槽采样确认下凹地板未被平地面覆盖，四壁和沟外地面检查通过。</li>
+<li>原有 666 处木坡／直坡地板采样和办公室双向通行检查继续通过。</li>
+<li>91 个有效网格、110579 个三角形，材质、法线和资产依赖检查通过。</li>
+</ul>
+<p><a href="validation.txt">完整验证结果</a> · <a href="Source~/ManualLayoutV13Before.txt">本轮手动布局基准</a> · <a href="Source~/BeforeTrenchSideRepair~/RouteReview.html">上一轮修改说明</a></p>
+<p>场景：<code>Assets/Max/WarehouseRecreation.unity</code>。预制体：<code>WarehouseEnvironment.prefab</code>。本轮修改前备份在 <code>Source~/BeforeTrenchSideRepair~</code>。截图保留；辅助摄像头已按要求清理，当前场景仅保留主摄像头。</p>
+<p class="muted">已做网格、碰撞和渲染检查，未进行真实滑板／Leap Motion 实滑；本轮没有重新配准整段视频。</p></main></body></html>

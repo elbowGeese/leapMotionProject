@@ -1,0 +1,12 @@
+Evidence,Confirmed,Action,Status
+最新手动布局,位置参考正确,125个原有变换保留,verified_after_reopen
+图一,灰色直坡更长更缓,6m水平长度2.25m下沉与同轴格栅,geometry_verified
+图二,平台抬高且周围木弧坡,保留1.323m顶面并弧形落地接墙,geometry_verified
+图三及确认,办公室内部两侧贯通,窗带层两个侧入口与空室内,6_capsule_casts_clear
+图四及确认,北墙长弧坡顶与两旁同高,顶部2.6m保留向外伸出轮廓,geometry_verified
+图五,门台不侵入木坡,裁端补面并接建筑,geometry_verified
+图六及确认,白色处整墙到屋顶,沿白块平面位置补墙和斜顶封口,geometry_verified
+手动窗墙与高坡,以当前位置为准,补外围平台和柱体接缝,preserved
+整段视频,本轮按手动布局修复,未重做完整视频机位配准,not_checked本轮截图V13,部分坡道侧面不可见,修正木侧板朝向并补10处端面,geometry_and_collision_verified
+本轮截图V13,中央红杆偏高,顶部降低至0.85m并保留平面位置,verified
+本轮截图V13,地板凹陷不明显,格栅约-0.70m沟底-1.05m并补四壁,196_samples_verified

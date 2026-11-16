@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Warehouse · 从玩家起点逐张核对</title>
+<style>
+:root{color-scheme:dark}*{box-sizing:border-box}body{margin:0;background:#131a20;color:#e5eaf0;font:16px/1.7 system-ui,"Microsoft YaHei",sans-serif}main{max-width:1240px;margin:auto;padding:36px 24px}h1{font-size:32px}h2{margin-top:40px}a{color:#82c9f5}p{max-width:1080px}.muted,figcaption{color:#aebcca}.warning{padding:18px 24px;background:#322a20;border-left:4px solid #e8b768}.pair{display:grid;grid-template-columns:1fr 1fr;gap:20px}.pair figure{margin:0;min-width:0}.pair img{display:block;width:100%}.crop{aspect-ratio:.88;overflow:hidden;background:#000}.crop img{width:200%;max-width:none}.crop.right img{transform:translateX(-50%)}figcaption{font-size:14px;padding:10px 0}.render{aspect-ratio:.88;object-fit:contain;background:#080e12}svg{width:100%;height:auto;background:#1d2933;border-radius:8px}svg text{font-family:system-ui,"Microsoft YaHei",sans-serif;fill:#eef4f8;font-size:15px}table{border-collapse:collapse;width:100%;font-size:14px}th,td{padding:12px;border-bottom:1px solid #3b4c57;text-align:left;vertical-align:top}th{background:#263642}code{color:#efc783}nav{display:flex;flex-wrap:wrap;gap:10px}nav a{padding:6px 12px;background:#283d4a;border-radius:6px}.tag{color:#edbd72}.wide{width:100%;display:block}.caption{font-size:14px;color:#acbac5}details{background:#1e2a33;padding:15px;margin-top:24px}summary{cursor:pointer}@media(max-width:650px){main{padding:20px 14px}h1{font-size:26px}.pair{gap:10px}table{font-size:12px}td,th{padding:8px}}
+</style></head><body><main>
+<p class="tag">WAREHOUSE / ROUTE AUDIT / 04</p>
+<h1>从 1:32 的两个起点，沿玩家路线重新核对</h1>
+<p class="warning"><b>之前确实没有对齐。</b>此前把两端相似的厂牌认成同一面墙，造成凹入平台放反；半管方向和金属通道归属也判断错误。当前场景已经修正这些结构关系。下面按行进顺序展示证据与重建视角，不把几何检查通过等同于“已经一模一样”。</p>
+<p>本轮重新暂停查看了 1:29–1:54 的连续行进段，并复看 2:18–2:26、2:43、2:53–2:54 等反向视角。主行进段约每 1–3 秒取样，转身位置另加补帧；不是逐一检查视频的所有编码帧。完整观察条目见 <a href="Source~/RouteFrameAudit.csv">本轮逐画面记录</a>。</p>
+<nav><a href="#map">位置图</a><a href="#p1">橙衣玩家起点</a><a href="#p2">黑衣玩家起点</a><a href="#turn">转身后的另一面墙</a><a href="#channel">金属通道</a><a href="#office">办公室</a><a href="#limits">剩余差异</a></nav>
+
+<h2 id="map">先固定方向，避免再次把两面墙混淆</h2>
+<p>这里的“北”仅指 Unity 的 +Z，“东”指 +X，不是原游戏公布的方位。南北两端都有厂牌；南端是 UBS 前坡、平台与后坡，北端是实墙、铁笼和箱子所在的局部高坡。</p>
+<svg viewBox="0 0 1120 760" role="img" aria-label="重建场景平面示意，P1面向南端平台，P2位于南侧走廊，半管及金属通道东西贯通，办公室在东端上方">
+<defs><marker id="orange" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="#f7a44c"/></marker><marker id="blue" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6Z" fill="#62c9fa"/></marker></defs>
+<text x="35" y="35" style="font-size:23px">俯视关系图 · 尺寸为重建估值</text><text x="900" y="35">北 / +Z ↑</text>
+<path d="M100 110H980V600H670V700H270V600H100Z" fill="#33404a" stroke="#91a5b6" stroke-width="5"/>
+<rect x="120" y="120" width="840" height="65" fill="#80684e"/><rect x="260" y="120" width="90" height="87" fill="#af8d64"/>
+<text x="430" y="147">北端实墙厂牌 · 连续低弧坡</text><text x="135" y="95">铁笼 + 箱子高坡 ③</text>
+<rect x="425" y="270" width="36" height="300" fill="#16232c" stroke="#8b9aa5"/><path d="M470 270V570" stroke="#d76151" stroke-width="7"/><text x="336" y="460">中央沟槽</text>
+<path d="M190 430H285L285 480H190Z M190 510H285L285 550H190Z" fill="#b59a72" stroke="#1c252d" stroke-width="4"/><text x="155" y="414">双跳台 / 积水侧</text>
+<rect x="590" y="250" width="360" height="230" fill="#6c5a49" stroke="#cbb28d" stroke-width="3"/>
+<path d="M650 250V480M900 250V480" stroke="#d2b38d" stroke-width="5"/><text x="701" y="287">半管平底</text>
+<rect x="590" y="340" width="360" height="42" fill="#263c48" stroke="#99bbc9" stroke-width="2"/><path d="M600 361H940" stroke="#98c0d2" stroke-width="3" stroke-dasharray="6 6"/>
+<text x="655" y="407">⑤ 金属带东西贯通</text><text x="595" y="503">西侧外坡 / 出口</text>
+<rect x="900" y="300" width="75" height="126" fill="none" stroke="#e2eaf0" stroke-width="4" stroke-dasharray="10 6"/><text x="818" y="232">⑥ 悬挑办公室在上方</text>
+<path d="M960 200V490" stroke="#d76151" stroke-width="5"/><text x="984" y="315">④</text><text x="984" y="343">墙边</text><text x="984" y="371">红管</text>
+<rect x="290" y="585" width="310" height="90" fill="#80684e"/><path d="M290 612H600M290 656H600" stroke="#ddbd8d" stroke-width="4"/><text x="350" y="638">水平平台</text><text x="286" y="737">南端：② UBS 前坡 → 平台 → RAG 后坡 / 厂牌</text>
+<rect x="605" y="590" width="54" height="97" fill="#a78056"/><text x="685" y="650">窄高坡开间</text><rect x="115" y="565" width="165" height="28" fill="#9d9c8c"/><text x="116" y="632">双门低平台</text>
+<circle cx="352" cy="260" r="11" fill="#f7a44c"/><text x="255" y="239">① P1 橙衣起点</text><path d="M352 275L405 570" fill="none" stroke="#f7a44c" stroke-width="5" marker-end="url(#orange)"/>
+<path d="M430 570L325 218" fill="none" stroke="#f7a44c" stroke-width="3" stroke-dasharray="8 8" marker-end="url(#orange)"/><path d="M350 214L920 214" stroke="#f7a44c" stroke-width="3" stroke-dasharray="8 8" marker-end="url(#orange)"/>
+<circle cx="845" cy="550" r="11" fill="#62c9fa"/><path d="M830 550H650" stroke="#62c9fa" stroke-width="5" marker-end="url(#blue)"/><text x="685" y="578">① P2 黑衣起点 · 朝西</text>
+</svg>
+<p class="caption">示意图表达邻接关系，不是测绘平面。虚线橙色路线连接已观察到的节点，不代表逐帧恢复出的精确运动轨迹。</p>
+
+<h2 id="p1">① 1:32 左屏：橙衣玩家从哪里出发</h2>
+<p><a href="https://www.youtube.com/watch?v=wQyMJNRPjjE&t=92s">打开 1:32</a>。关键组合是：<b>左前红扶手、右前双跳台、前方 UBS 低前坡、其后厂牌与后坡、左侧窄高坡、右侧双门低台。</b>因此起点在大厅西半部，位于沟槽西侧，朝南端凹口方向。当前标记约为 <code>(-9.4, 0.05, 9.5)</code>，朝向约 172°；这是重建坐标，不是从原游戏读取的位置。</p>
+<div class="pair"><figure><div class="crop"><img src="Source~/References/17_RecessFront_0132.png" alt="用户1分32秒截图左屏，橙衣玩家面朝入口凹台"></div><figcaption>原图左屏 · 保留原画面遮挡；仅用网页裁出左半幅</figcaption></figure><figure><img class="render" src="Previews/07_P1_Start_0132.png" alt="重建的橙衣玩家起点后方视角"><figcaption>修正后的起点后方相机 · 没有添加人物，左右设施已按原图重排</figcaption></figure></div>
+<p class="muted">仍可见差异：厂牌及窗格比例、起点到设施的距离、红扶手在画面中的长度没有完成精确相机标定。这里验证的是同一组设施的方向和先后关系。</p>
+
+<h2 id="p2">① 1:32 右屏：黑衣玩家在半管南侧走廊</h2>
+<p>此处不是半管内部。<b>画面左边是建筑南墙的连续弧坡，右边是半管外侧坡面。</b>他朝西行进，1:34–1:35 向左驶上南墙，再转回大厅。当前标记约为 <code>(17, 0.05, -13)</code>，朝向 272°。</p>
+<div class="pair"><figure><div class="crop right"><img src="Source~/References/17_RecessFront_0132.png" alt="原图右屏，左侧墙坡与右侧半管之间的走廊"></div><figcaption>原图右屏 · 走廊两侧设施不同</figcaption></figure><figure><img class="render" src="Previews/08_P2_Start_0132.png" alt="重建的黑衣玩家起点后方视角"><figcaption>重建 · 左侧沿墙弧坡、右侧半管外坡，前方为西墙</figcaption></figure></div>
+
+<h2>② 1:35–1:36：先到 UBS 前坡，再看见后方平台</h2>
+<p><a href="https://www.youtube.com/watch?v=wQyMJNRPjjE&t=95s">1:35</a> 左屏仍向起点正前方行进；<a href="https://www.youtube.com/watch?v=wQyMJNRPjjE&t=96s">1:36</a> 上坡与转身补帧把前坡、后坡和平台区分开。现在把整套凹口移到南端，保留可进入的水平台面、左侧独立高坡开间和右侧 L 形门台，并移除了挡在开间前的旧墙。</p>
+<div class="pair"><figure><img src="Source~/References/18_FrontQuarter_0135.png" alt="1分35秒原图"><figcaption>原图 · 左屏前后坡和招牌，右屏正在驶上走廊左侧墙坡</figcaption></figure><figure><img src="Previews/05_SouthRecesses.png" alt="重建的南端平台区"><figcaption>重建 · 单独展示南端结构，非同一机位</figcaption></figure></div>
+
+<h2 id="turn">③ 1:39–1:42：转身后遇到的是另一端的箱子高坡</h2>
+<p><a href="https://www.youtube.com/watch?v=wQyMJNRPjjE&t=99s">1:39</a> 两个玩家接近铁笼和堆箱附近的局部高坡；左屏此前已经从 UBS 前坡掉头。这里的厂牌下是实墙与涂鸦带，旁边是 KDR/GERN 等标记，不能与南端 UBS/RAG 平台合并。已恢复北端实墙、长弧坡、局部高唇和箱子。</p>
+<div class="pair"><figure><div class="crop right"><img src="Source~/References/19_Extension_0139.png" alt="原图右屏的铁笼和箱子高坡"></div><figcaption>原图 1:39 右屏 · 铁笼、箱子、高低唇口同框</figcaption></figure><figure><img class="render" src="Previews/09_P1_North_0139.png" alt="重建北端箱子高坡"><figcaption>重建北端检查相机 · 比较铁笼、箱子和局部高坡的邻接关系</figcaption></figure></div>
+
+<h2 id="channel">④–⑤ 1:46–1:54：墙边红管 → 半管 → 金属带向西出场</h2>
+<p><a href="https://www.youtube.com/watch?v=wQyMJNRPjjE&t=106s">1:46</a> 左屏沿东墙红管前进，<a href="https://www.youtube.com/watch?v=wQyMJNRPjjE&t=112s">1:52</a> 沿金属带看向西侧大厅，随后驶出至中央设施区。金属不是南端两条独立下坡，而是<b>半管中间连续的一条带</b>：西侧外坡 → 低金属坡顶 → 内侧斜坡 → 半管平底 → 办公室一端。木质坡面被涂成红蓝色时，中央金属仍为灰色，这是识别它的重要依据。</p>
+<div class="pair"><figure><div class="crop"><img src="Source~/References/09_ChannelAndKicker.png" alt="1分52秒原图左屏沿灰色金属带驶出半管"></div><figcaption>原图 1:52 左屏 · 红色两侧木坡与灰色金属带；背景是西墙</figcaption></figure><figure><img class="render" src="Previews/10_ChannelWest_0152.png" alt="重建沿金属通道向西的视角"><figcaption>重建向西 · 两侧木弧坡、中央金属斜坡、远端西墙。占领色未加入</figcaption></figure></div>
+<p>半管的滑行方向现为东西向，唇口沿南北向。金属带宽约 2.8 m、低坡顶约 2.15 m，木坡高约 3.45 m；这些数值仍是估值，不能当作原关卡尺寸。</p>
+
+<h2 id="office">⑥ 反向补证：办公室悬在金属通道东端上方</h2>
+<p><a href="https://www.youtube.com/watch?v=wQyMJNRPjjE&t=138s">2:18–2:19</a> 和 <a href="https://www.youtube.com/watch?v=wQyMJNRPjjE&t=144s">2:24–2:26</a> 提供通道反向观察；<a href="https://www.youtube.com/watch?v=wQyMJNRPjjE&t=174s">2:54 右屏</a> 更清楚地显示白色办公室、其下墙面与半管坡面。办公室应位于东侧上方，不能把通道当成指向另一面入口墙的设施。这些补帧是在浏览器中直接观察，没有另存成原视频图片。</p>
+<div class="pair"><figure><img class="render" src="Previews/11_ChannelOffice_0219.png" alt="重建金属通道向东看办公室"><figcaption>重建向东 · 半管中央金属带和办公室上下对应</figcaption></figure><figure><img class="render" src="Previews/12_OfficePipe_0146.png" alt="沿东墙红管看办公室下方"><figcaption>重建沿墙视角 · 红管延伸到办公室下方区域</figcaption></figure></div>
+
+<h2>修正后的全场关系</h2><img class="wide" src="Previews/01_ReferenceOverview.png" alt="修正后的仓库总览"><p class="caption">前景中央沟槽；右侧半管与连续金属带；办公室在其东端上方；远端厂牌为北端实墙厂牌。起点面向的南端凹口在相机后方。</p>
+<h2 id="limits">验证范围与仍然存在的差异</h2>
+<table><thead><tr><th>项目</th><th>当前状态</th></tr></thead><tbody>
+<tr><td>两端厂牌与凹入平台</td><td>已区分，凹口移至南端；北端恢复铁笼、箱子和高坡。平台跨度、后退量待更精确标定。</td></tr>
+<tr><td>半管 / 金属带 / 办公室</td><td>已改成东西向连通关系；移除南入口的两条错误独立通道。斜坡角度、宽度、面板分缝仍有差异。</td></tr>
+<tr><td>玩家起点</td><td>已添加两个起点和路线节点，场景中提供四个停用的检查相机。位置与相机焦距都是估计；没有原游戏坐标或动态镜头数据。</td></tr>
+<tr><td>保存与碰撞</td><td>重新打开保存场景，检查坡面法线、连续金属带支撑、平台通行、两起点左右关系和资产依赖；详见 <a href="validation.txt">验证输出</a>。</td></tr>
+<tr><td>视觉相似度</td><td>尚未达到逐像素一致。建筑比例、窗格、墙面老化、光照、涂鸦和杂物仍不同；不报告未经标定的“还原百分比”。</td></tr>
+<tr><td>玩法</td><td>本轮只修改环境和观察标记；没有新增玩家、滑板运动或 Leap Motion 控制器，未测试实机滑行手感。</td></tr>
+</tbody></table>
+<details><summary>文件、场景与历史记录</summary><p>场景：<code>Assets/Max/WarehouseRecreation.unity</code><br>环境预制体：<code>Assets/Max/Warehouse/WarehouseEnvironment.prefab</code><br>Hierarchy：<code>Video route anchors - estimated poses</code> 下可找到两个起点、路线节点和检查相机。相机默认停用，避免同时输出。</p><p>本轮改动前的完整重建场景、网格、预览和脚本保存在 <code>Source~/BeforeRouteAudit~</code>。旧 <a href="StructureReview.html">第三版结构报告</a> 和 <a href="LayoutReview.html">第二版布局报告</a> 保留作历史记录，其中关于凹口位于北端、半管唇口方向以及独立入口金属通道的结论已撤回。</p></details>
+</main></body></html>

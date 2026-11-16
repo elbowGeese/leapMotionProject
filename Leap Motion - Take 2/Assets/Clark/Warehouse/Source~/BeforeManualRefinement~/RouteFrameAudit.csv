@@ -1,0 +1,12 @@
+Evidence,Observed,Current interpretation,Confidence
+用户图1及回答,柱在整面端墙中心且很细,X0宽0.34m凸出实际墙面0.25m,user_confirmed_dimensions_estimated
+用户图2,大坡中间没有缝隙,连续13.1m宽曲面加贴面金属格栅,user_confirmed_dimensions_estimated
+用户图2及回答,外坡小幅上升内坡更深且侧出口对齐大坡中心,坡顶0.75坑底负2.25保持Z向并调整侧接坡,user_confirmed_dimensions_estimated
+用户图3,该坡无第二层且到左墙,面对双高坡左侧正X仅单层且移除外侧挡块,user_confirmed
+用户图4,上层较长且中间窗墙挡视线,后伸8.7m中间窗墙后方保留3.5m绕行,user_confirmed_dimensions_estimated
+用户图5,高坡和双层坡间有铁网隔断,两侧补铁网结构,user_confirmed
+用户说明,办公室更低更大且顶部接屋顶,楼板顶3.9m平面6.86x12m上部连接屋顶,user_confirmed_dimensions_estimated
+1:32旧机位,原锚点依赖过时单高坡结构,旧机位保留但旧像素误差不能用于当前布局,pending_camera_fit
+1:46与1:52,办公室和金属通道已多次结构更新,保留路线相机但还未重新配准,pending_camera_fit
+2:03,红色坡组用户视频截图用于结构提示,当前渲染检查关系不能宣称同机位吻合,pending_camera_fit
+

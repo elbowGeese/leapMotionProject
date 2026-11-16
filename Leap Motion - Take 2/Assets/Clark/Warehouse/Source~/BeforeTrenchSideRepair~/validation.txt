@@ -1,0 +1,10 @@
+PASS: saved scene reopened; 125 original manual transforms preserved.
+PASS: 81 finite valid meshes; 112275 triangles; supported restored materials.
+PASS: 366 joined wood-ramp/floor samples; 300 straight transverse entry/drain samples.
+PASS: 6 m straight entry (20.6 degrees); old floor opening filled; north projection top is 2.6 m.
+PASS: identical tall roll-in profiles; transverse window wall at pier front; route clear behind.
+PASS: raised 1.323 m platform with curved wood banks reaching ground and wall.
+PASS: office floor supported; 6 capsule casts clear through both side entrances at window-floor level.
+PASS: full reference wall meets pitched roof; loading dock trimmed and rear seams closed.
+PASS: orphan pit decoration and old floating crate colliders removed; moved office reaches roof.
+Limit: geometry/placement checks and rendered inspection, not full video camera matching or actual skating/Leap Motion testing.

@@ -13,7 +13,7 @@ namespace Fingerboard
             public Transform landing;
         }
 
-        private enum State { Grounded, Airborne, RampAir, Crashed }
+        private enum State { Grounded, Airborne, RampAir, Grinding, Crashed }
         public enum Trick { None, Kickflip, PopShoveIt }
 
         [Header("Board")]
@@ -36,7 +36,7 @@ namespace Fingerboard
         [SerializeField] private Camera airCamera;
         [SerializeField] private Vector3 airCameraOffset = new Vector3(3f, 1.3f, -3f);
 
-        private const float MinGroundY = 0.25f;
+        private const float MinGroundY = 0.1f;
         private const float GroundGap = 0.045f;
 
         private Rigidbody body;
@@ -82,6 +82,7 @@ namespace Fingerboard
                 if (state == State.Crashed) return "Crashed: " + crashReason;
                 if (activeTrick != Trick.None) return activeTrick.ToString();
                 if (state == State.RampAir) return "Half-pipe air";
+                if (state == State.Grinding) return "Boardslide";
                 if (state == State.Airborne) return "Airborne";
                 return "Cruising";
             }
@@ -133,6 +134,8 @@ namespace Fingerboard
             }
 
             bool ollie = ollieRequested;
+            bool grind = grindRequested;
+            grindRequested = false;
             Trick requested = queuedTrick;
             ollieRequested = false;
             queuedTrick = Trick.None;
@@ -144,6 +147,16 @@ namespace Fingerboard
                 UpdateRampAir(requested);
                 return;
             }
+
+            if (state == State.Grinding)
+            {
+                UpdateGrind(ollie, requested);
+                return;
+            }
+
+            if (grind && TryStartGrind()) return;
+
+
 
             if (state == State.Grounded)
             {
@@ -211,7 +224,7 @@ namespace Fingerboard
 
         private void ReadContacts(Collision collision)
         {
-            if (state == State.RampAir || state == State.Crashed) return;
+            if (state == State.RampAir || state == State.Grinding || state == State.Crashed) return;
 
             for (int i = 0; i < collision.contactCount; i++)
             {
@@ -247,6 +260,123 @@ namespace Fingerboard
 
         private void OnTriggerEnter(Collider other) => CheckRampLip(other);
         private void OnTriggerStay(Collider other) => CheckRampLip(other);
+
+
+
+        [System.Serializable]
+        private class GrindEdge
+        {
+            public Transform start;
+            public Transform end;
+        }
+
+        [Header("Boardslide")]
+        [SerializeField] private GrindEdge[] grindEdges;
+        [SerializeField, Min(0.1f)] private float grindSpeed = 4f;
+        [SerializeField, Min(0.05f)] private float grindSnapRange = 0.55f;
+        [SerializeField, Min(0.05f)] private float grindSnapHeight = 0.55f;
+        [SerializeField, Range(0f, 90f)] private float grindBoardAngle = 60f;
+        [SerializeField, Range(0f, 30f)] private float grindNoseUpAngle = 12f;
+        [SerializeField, Min(0f)] private float grindDeckHeight = 0.14f;
+
+        private bool grindRequested;
+        private Vector3 grindEnd;
+        private Vector3 grindDirection;
+
+        public void RequestGrind() => grindRequested = true;
+
+        private bool TryStartGrind()
+        {
+            if (grindEdges == null || activeTrick != Trick.None) return false;
+
+            Vector3 deckPosition = body.position + Vector3.up * grindDeckHeight;
+            Vector3 forward = body.rotation * Vector3.forward;
+            float snapRangeSquared = grindSnapRange * grindSnapRange;
+            float bestDistanceSquared = float.PositiveInfinity;
+            Vector3 snapPoint = Vector3.zero;
+            bool found = false;
+
+            foreach (GrindEdge edge in grindEdges)
+            {
+                if (edge == null || edge.start == null || edge.end == null)
+                    continue;
+
+                Vector3 start = edge.start.position;
+                Vector3 end = edge.end.position;
+                Vector3 line = end - start;
+                Vector3 flatLine = Vector3.ProjectOnPlane(line, Vector3.up);
+                if (flatLine.sqrMagnitude < 0.0025f) continue;
+
+                float fraction = Mathf.Clamp01(
+                    Vector3.Dot(deckPosition - start, flatLine) / flatLine.sqrMagnitude);
+
+                Vector3 closest = start + line * fraction;
+                Vector3 offset = closest - deckPosition;
+                float horizontalDistanceSquared = offset.x * offset.x + offset.z * offset.z;
+
+                if (horizontalDistanceSquared > snapRangeSquared ||
+                    Mathf.Abs(offset.y) > grindSnapHeight ||
+                    offset.sqrMagnitude >= bestDistanceSquared)
+                    continue;
+
+                float alignment = Vector3.Dot(forward, flatLine.normalized);
+                bool towardEnd = Mathf.Abs(alignment) >= 0.15f
+                    ? alignment > 0f
+                    : fraction <= 0.5f;
+
+                Vector3 exit = towardEnd ? end : start;
+                if ((exit - closest).sqrMagnitude < 0.01f)
+                    exit = towardEnd ? start : end;
+
+                Vector3 travel = exit - closest;
+                if (travel.sqrMagnitude < 0.01f) continue;
+
+                bestDistanceSquared = offset.sqrMagnitude;
+                snapPoint = closest;
+                grindEnd = exit;
+                grindDirection = travel.normalized;
+                found = true;
+            }
+
+            if (!found) return false;
+
+            Quaternion heading = Quaternion.LookRotation(
+                Vector3.ProjectOnPlane(grindDirection, Vector3.up), Vector3.up);
+
+            Velocity = Vector3.zero;
+            body.angularVelocity = Vector3.zero;
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            body.isKinematic = true;
+            state = State.Grinding;
+            hasGroundContact = false;
+            body.MovePosition(snapPoint);
+            body.MoveRotation(heading);
+            return true;
+        }
+
+        private void UpdateGrind(bool ollie, Trick requested)
+        {
+            bool reachedEnd = (body.position - grindEnd).sqrMagnitude < 0.0001f;
+
+            if (ollie || reachedEnd)
+            {
+                body.isKinematic = false;
+                body.collisionDetectionMode = groundCollisionMode;
+                Velocity = grindDirection * grindSpeed + Vector3.up * (ollie ? jumpSpeed : 0.4f);
+                incomingVelocity = Velocity;
+                state = State.Airborne;
+                isOllie = ollie;
+                airTime = 0f;
+                UpdateTrick(requested, 0f);
+                return;
+            }
+
+            body.MovePosition(Vector3.MoveTowards(
+                body.position, grindEnd, grindSpeed * Time.fixedDeltaTime));
+        }
+
+
+
 
         private void CheckRampLip(Collider other)
         {
@@ -400,6 +530,7 @@ namespace Fingerboard
             queuedTrick = Trick.None;
             isOllie = false;
             deckYaw = 0f;
+            grindRequested = false;
             ollieRequested = false;
             resetRequested = false;
             SetAirCamera(false);
@@ -440,6 +571,10 @@ namespace Fingerboard
                 localUp = transform.InverseTransformDirection(groundNormal);
                 offset = contactSphere.center - localUp * contactSphere.radius;
             }
+            else if (state == State.Grinding)
+            {
+                offset = Vector3.down * grindDeckHeight;
+            }
 
             visualUp = Vector3.Slerp(visualUp, localUp, blend);
             visualOffset = Vector3.Lerp(visualOffset, offset, blend);
@@ -449,6 +584,11 @@ namespace Fingerboard
                 pitch = -25f * Mathf.Sin(Mathf.PI * Mathf.Clamp01(airTime / ollieReadyTime));
 
             float yaw = deckYaw;
+            if (state == State.Grinding)
+            {
+                yaw += grindBoardAngle;
+                pitch = -grindNoseUpAngle;
+            }
             float roll = 0f;
             float lift = 0f;
 

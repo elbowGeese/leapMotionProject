@@ -1,0 +1,12 @@
+PASS: saved scene reopened; finite meshes, valid normals, non-degenerate triangles and supported materials.
+PASS: tall roll-in pair, left single tier to side wall, right double tier and longer upper passage.
+PASS: window partition blocks direct sightline; rear bypass remains supported and clear; both mesh dividers exist.
+PASS: thin shallow north pier centred on the entire end wall.
+PASS: 55 curved-surface collider/normal samples.
+PASS: 204 bowl samples across left, metal centre and right; no gap or hidden hall slab.
+PASS: shallow outside +0.75 m, recessed floor -2.25 m and both lateral crest approaches.
+PASS: office floor 3.9 m, expanded 6.86 x 12 m footprint and upper walls to roof.
+PASS: loading dock/stairs, north convex deck and central service trench preserved.
+PASS: temporary red/blue materials restored; saved scene dependencies self-contained.
+Meshes: 73; vertices: 238634; triangles: 117670; colliders: 41.
+Dimensions remain visual estimates. These checks verify topology and support, not pixel matching or skateboard/Leap Motion control.

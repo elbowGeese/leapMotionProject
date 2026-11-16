@@ -27,6 +27,7 @@ namespace Fingerboard
             bool left = keyboard.aKey.isPressed;
             bool right = keyboard.dKey.isPressed;
             bool ollie = keyboard.spaceKey.wasPressedThisFrame;
+            bool grind = keyboard.eKey.wasPressedThisFrame;
             bool kickflip = keyboard.fKey.wasPressedThisFrame;
             bool shoveIt = keyboard.gKey.wasPressedThisFrame;
             bool reset = keyboard.rKey.wasPressedThisFrame;
@@ -34,6 +35,7 @@ namespace Fingerboard
             bool left = Input.GetKey(KeyCode.A);
             bool right = Input.GetKey(KeyCode.D);
             bool ollie = Input.GetKeyDown(KeyCode.Space);
+            bool grind = Input.GetKeyDown(KeyCode.E);
             bool kickflip = Input.GetKeyDown(KeyCode.F);
             bool shoveIt = Input.GetKeyDown(KeyCode.G);
             bool reset = Input.GetKeyDown(KeyCode.R);
@@ -44,6 +46,12 @@ namespace Fingerboard
             if (reset)
             {
                 board.RequestReset();
+                return;
+            }
+
+            if (grind)
+            {
+                board.RequestGrind();
                 return;
             }
 
