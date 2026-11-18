@@ -4,6 +4,12 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Clark/Tutorial.unity
+    guid: 7331106c287aea44a8abbceaf83ad4b1
+  - enabled: 1
+    path: Assets/Clark/GameScene.unity
+    guid: 77ab4fd400b09cd43a8d7f0f2a13f663
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 289c1b55c9541489481df5cc06664110, type: 3}

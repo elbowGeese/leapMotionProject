@@ -7,6 +7,15 @@ namespace Fingerboard
     [RequireComponent(typeof(SkateboardController))]
     public class SkateboardLeapInput : MonoBehaviour
     {
+        public bool IsNeutralPose { get; private set; }
+        public float Steering => hasTracking && hasPreviousSample ? steering : 0f;
+        public float PalmX => previousPalmPosition.x;
+
+        public float ReadSteeringFrom(float centerX)
+        {
+            return hasTracking && hasPreviousSample ? GetSteeringTarget(PalmX - centerX) : 0f;
+        }
+
         [SerializeField] private LeapProvider provider;
 
         [Header("Steering")]
@@ -92,6 +101,7 @@ namespace Fingerboard
             Hand hand = frame.GetHand(Chirality.Right);
             if (hand == null)
             {
+                IsNeutralPose = false;
                 hasPreviousSample = false;
                 pendingPose = Gesture.None;
                 poseSeenLastSample = false;
@@ -138,6 +148,7 @@ namespace Fingerboard
             bool openHand = extendedFingers >= 3;
             bool palmDown = palmFacingY <= -0.55f;
             bool neutral = palmDown && openHand && Mathf.Abs(palmSpeed) < 0.22f;
+            IsNeutralPose = neutral;
 
             if (!gestureArmed)
             {
@@ -248,16 +259,19 @@ namespace Fingerboard
 
         private void UpdateSteering(float palmX, float dt)
         {
-            float offset = palmX - steeringCenterX;
-            float range = Mathf.Max(fullTurnDistance, steeringDeadZone + 0.01f);
-            float target = Mathf.InverseLerp(steeringDeadZone, range, Mathf.Abs(offset));
-            target *= Mathf.Sign(offset);
-            if (invertSteering) target = -target;
-
+            float target = GetSteeringTarget(palmX - steeringCenterX);
             float blend = 1f - Mathf.Exp(-18f * dt);
             steering = Mathf.Lerp(steering, target, blend);
             if (target == 0f && Mathf.Abs(steering) < 0.01f) steering = 0f;
             board.SetSideInput(steering);
+        }
+
+        private float GetSteeringTarget(float offset)
+        {
+            float range = Mathf.Max(fullTurnDistance, steeringDeadZone + 0.01f);
+            float magnitude = Mathf.InverseLerp(steeringDeadZone, range, Mathf.Abs(offset));
+            float target = magnitude * Mathf.Sign(offset);
+            return invertSteering ? -target : target;
         }
 
         private void FireGesture(Gesture gesture)
@@ -291,6 +305,7 @@ namespace Fingerboard
 
         private void ClearTracking()
         {
+            IsNeutralPose = false;
             hasTracking = false;
             hasPreviousSample = false;
             gestureArmed = false;

@@ -1,4 +1,6 @@
+using TMPro;
 using UnityEngine;
+using UnityEngine.UI;
 
 
 namespace Fingerboard
@@ -14,7 +16,7 @@ namespace Fingerboard
         }
 
         private enum State { Grounded, Airborne, RampAir, Grinding, Crashed }
-        public enum Trick { None, Kickflip, PopShoveIt }
+        public enum Trick { None, Kickflip, PopShoveIt, Ollie, Grinding }
 
         [Header("Board")]
         [SerializeField] private Transform boardVisual;
@@ -36,6 +38,46 @@ namespace Fingerboard
         [SerializeField] private Camera airCamera;
         [SerializeField] private Vector3 airCameraOffset = new Vector3(3f, 1.3f, -3f);
 
+        [Header("Scoring")]
+        [SerializeField, Min(0)] private int pointsPerSecond = 10;
+        [SerializeField, Min(0)] private int olliePoints = 40;
+        [SerializeField, Min(0)] private int flipPoints = 100;
+        [SerializeField, Min(0)] private int grindPointsPerSecond = 40;
+        [SerializeField] private TMP_Text scoreText;
+
+        [Header("Trick Feed")]
+        [SerializeField] private SkateboardTrickFeed trickFeed;
+
+        [Header("Skate Audio")]
+        [SerializeField] private AudioSource cruisingSource;
+        [SerializeField] private AudioClip cruisingClip;
+        [SerializeField] private AudioClip grindingClip;
+        [SerializeField] private AudioSource impactSource;
+        [SerializeField] private AudioClip landingClip;
+        [SerializeField] private AudioClip hurtClip;
+
+        [Header("Scene Music")]
+        [SerializeField] private AudioSource musicSource;
+        [SerializeField] private AudioClip musicClip;
+
+        [Header("Crash and Respawn")]
+        [SerializeField] private Image crashOverlay;
+        [SerializeField, Range(0f, 1f)] private float crashFlashOpacity = 0.55f;
+        [SerializeField, Min(0.01f)] private float crashFlashDuration = 0.45f;
+        [SerializeField, Min(0f)] private float respawnDelay = 2f;
+
+        public int Score { get; private set; }
+        public bool ShowsScoreOnHud => scoreText != null && scoreText.isActiveAndEnabled;
+        public bool IsCruising => roundRunning && state == State.Grounded;
+        public event System.Action<Trick> TrickCompleted;
+
+        private bool roundRunning = true;
+        private bool roundHoldingBody;
+        private double scoreTime;
+        private int completedAirTricks;
+        private Trick lastCompletedFlip;
+        private float grindTime;
+
         private const float MinGroundY = 0.1f;
         private const float GroundGap = 0.045f;
 
@@ -52,6 +94,8 @@ namespace Fingerboard
         private Vector3 visualUp = Vector3.up;
         private Vector3 visualOffset;
         private float turnInput;
+        private float? tutorialSteeringInput;
+        private Trick? tutorialAllowedTrick;
 
         private State state;
         private bool ollieRequested;
@@ -63,6 +107,7 @@ namespace Fingerboard
         private float trickTime;
         private float deckYaw;
         private string crashReason;
+        private float crashedAt;
 
         private Vector3 rampStart;
         private Vector3 rampEnd;
@@ -116,17 +161,114 @@ namespace Fingerboard
                 visualRestRotation = boardVisual.localRotation;
             }
 
+            if (cruisingSource != null)
+            {
+                cruisingSource.Stop();
+                cruisingSource.clip = null;
+                cruisingSource.playOnAwake = false;
+                cruisingSource.loop = true;
+            }
+
+            SetCrashOverlayAlpha(0f);
+            SetScore(0);
             SetAirCamera(false);
         }
 
+        private void Start()
+        {
+            if (musicSource == null || musicClip == null) return;
+
+            musicSource.clip = musicClip;
+            musicSource.loop = true;
+            musicSource.spatialBlend = 0f;
+            musicSource.Play();
+        }
+
+        private void OnDisable()
+        {
+            if (cruisingSource != null)
+                cruisingSource.Stop();
+
+            SetCrashOverlayAlpha(0f);
+        }
+
+        private void Update()
+        {
+            if (!roundRunning || state != State.Crashed) return;
+
+            float elapsed = Time.unscaledTime - crashedAt;
+            if (elapsed >= respawnDelay)
+            {
+                RespawnBoard();
+                return;
+            }
+
+            float fade = Mathf.Clamp01(elapsed / crashFlashDuration);
+            SetCrashOverlayAlpha(crashFlashOpacity * (1f - fade));
+        }
+
+        public void SetRoundRunning(bool running)
+        {
+            if (roundRunning == running) return;
+
+            roundRunning = running;
+            turnInput = 0f;
+            ollieRequested = false;
+            grindRequested = false;
+            queuedTrick = Trick.None;
+            resetRequested = false;
+
+            if (running)
+            {
+                if (roundHoldingBody)
+                {
+                    body.isKinematic = false;
+                    body.collisionDetectionMode = groundCollisionMode;
+                    roundHoldingBody = false;
+                }
+
+                return;
+            }
+
+            if (!body.isKinematic)
+            {
+                Velocity = Vector3.zero;
+                body.angularVelocity = Vector3.zero;
+                body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+                body.isKinematic = true;
+                roundHoldingBody = true;
+            }
+
+            SetCrashOverlayAlpha(0f);
+        }
+
         public void SetSideInput(float amount) => turnInput = Mathf.Clamp(amount, -1f, 1f);
+        public void SetTutorialSteering(float? amount) => tutorialSteeringInput = amount;
+
+        public void SetTutorialAllowedTrick(Trick? trick)
+        {
+            tutorialAllowedTrick = trick;
+            ollieRequested = false;
+            grindRequested = false;
+            queuedTrick = Trick.None;
+        }
+
         public void RequestOllie() => ollieRequested = true;
         public void RequestKickflip() => queuedTrick = Trick.Kickflip;
         public void RequestPopShoveIt() => queuedTrick = Trick.PopShoveIt;
         public void RequestReset() => resetRequested = true;
 
+        public void MoveToCheckpoint(Transform checkpoint)
+        {
+            spawnPosition = checkpoint.position;
+            spawnRotation = checkpoint.rotation;
+            RespawnBoard();
+        }
+
         private void FixedUpdate()
         {
+            if (!roundRunning) return;
+
             if (resetRequested)
             {
                 ResetBoard();
@@ -140,7 +282,18 @@ namespace Fingerboard
             ollieRequested = false;
             queuedTrick = Trick.None;
 
+            if (tutorialAllowedTrick is Trick allowed)
+            {
+                bool allowedFlip = requested != Trick.None && requested == allowed;
+                // A flip's jump request must be allowed or rejected together with the flip.
+                ollie &= allowedFlip || (allowed == Trick.Ollie && requested == Trick.None);
+                grind &= allowed == Trick.Grinding;
+                if (!allowedFlip) requested = Trick.None;
+            }
+
             if (state == State.Crashed) return;
+
+            TickScore();
 
             if (state == State.RampAir)
             {
@@ -170,17 +323,26 @@ namespace Fingerboard
                 else if (ollie)
                 {
                     Vector3 heading = body.rotation * Vector3.forward;
-                    Velocity = heading * maxSpeed + Vector3.up * jumpSpeed;
+                    float forwardSpeed = tutorialSteeringInput.HasValue ? 0f : maxSpeed;
+                    Velocity = heading * forwardSpeed + Vector3.up * jumpSpeed;
                     body.angularVelocity = Vector3.zero;
                     state = State.Airborne;
                     isOllie = true;
                     airTime = 0f;
+
+                    if (requested == Trick.None && trickFeed != null)
+                        trickFeed.ShowOllie();
                 }
                 else
                 {
-                    body.angularVelocity = Vector3.up * (turnInput * turnSpeed * Mathf.Deg2Rad);
+                    float steering = tutorialSteeringInput ?? turnInput;
+                    if (tutorialSteeringInput.HasValue && Mathf.Abs(steering) < 0.12f)
+                        steering = 0f;
+
+                    float speed = tutorialSteeringInput.HasValue && steering == 0f ? 0f : maxSpeed;
+                    body.angularVelocity = Vector3.up * (steering * turnSpeed * Mathf.Deg2Rad);
                     Vector3 heading = body.rotation * Vector3.forward;
-                    Velocity = Vector3.ProjectOnPlane(heading, groundNormal).normalized * maxSpeed;
+                    Velocity = Vector3.ProjectOnPlane(heading, groundNormal).normalized * speed;
                 }
             }
 
@@ -224,7 +386,9 @@ namespace Fingerboard
 
         private void ReadContacts(Collision collision)
         {
-            if (state == State.RampAir || state == State.Grinding || state == State.Crashed) return;
+            if (!roundRunning || state == State.RampAir ||
+                state == State.Grinding || state == State.Crashed)
+                return;
 
             for (int i = 0; i < collision.contactCount; i++)
             {
@@ -309,7 +473,6 @@ namespace Fingerboard
 
                 float fraction = Mathf.Clamp01(
                     Vector3.Dot(deckPosition - start, flatLine) / flatLine.sqrMagnitude);
-
                 Vector3 closest = start + line * fraction;
                 Vector3 offset = closest - deckPosition;
                 float horizontalDistanceSquared = offset.x * offset.x + offset.z * offset.z;
@@ -340,6 +503,9 @@ namespace Fingerboard
 
             if (!found) return false;
 
+            BankAirScore();
+            grindTime = 0f;
+
             Quaternion heading = Quaternion.LookRotation(
                 Vector3.ProjectOnPlane(grindDirection, Vector3.up), Vector3.up);
 
@@ -351,15 +517,23 @@ namespace Fingerboard
             hasGroundContact = false;
             body.MovePosition(snapPoint);
             body.MoveRotation(heading);
+
+            if (trickFeed != null)
+                trickFeed.ShowGrinding();
+
+            TrickCompleted?.Invoke(Trick.Grinding);
             return true;
         }
 
         private void UpdateGrind(bool ollie, Trick requested)
         {
-            bool reachedEnd = (body.position - grindEnd).sqrMagnitude < 0.0001f;
+            float distanceLeft = Vector3.Distance(body.position, grindEnd);
+            bool reachedEnd = distanceLeft < 0.01f;
 
             if (ollie || reachedEnd)
             {
+                AddScore(Mathf.RoundToInt(grindTime * grindPointsPerSecond));
+                grindTime = 0f;
                 body.isKinematic = false;
                 body.collisionDetectionMode = groundCollisionMode;
                 Velocity = grindDirection * grindSpeed + Vector3.up * (ollie ? jumpSpeed : 0.4f);
@@ -367,10 +541,15 @@ namespace Fingerboard
                 state = State.Airborne;
                 isOllie = ollie;
                 airTime = 0f;
+
+                if (ollie && requested == Trick.None && trickFeed != null)
+                    trickFeed.ShowOllie();
+
                 UpdateTrick(requested, 0f);
                 return;
             }
 
+            grindTime += Mathf.Min(Time.fixedDeltaTime, distanceLeft / grindSpeed);
             body.MovePosition(Vector3.MoveTowards(
                 body.position, grindEnd, grindSpeed * Time.fixedDeltaTime));
         }
@@ -380,7 +559,7 @@ namespace Fingerboard
 
         private void CheckRampLip(Collider other)
         {
-            if (state != State.Grounded || rampSides == null || incomingVelocity.y <= 0.15f)
+            if (!roundRunning || state != State.Grounded || rampSides == null || incomingVelocity.y <= 0.15f)
                 return;
 
             foreach (RampSide side in rampSides)
@@ -474,6 +653,14 @@ namespace Fingerboard
             {
                 activeTrick = requested;
                 trickTime = 0f;
+
+                if (trickFeed != null)
+                {
+                    if (requested == Trick.Kickflip)
+                        trickFeed.ShowKickflip();
+                    else if (requested == Trick.PopShoveIt)
+                        trickFeed.ShowPopShoveIt();
+                }
             }
 
             if (activeTrick == Trick.None) return;
@@ -485,6 +672,8 @@ namespace Fingerboard
             if (activeTrick == Trick.PopShoveIt)
                 deckYaw = Mathf.Repeat(deckYaw + 180f, 360f);
 
+            completedAirTricks++;
+            lastCompletedFlip = activeTrick;
             activeTrick = Trick.None;
         }
 
@@ -496,19 +685,90 @@ namespace Fingerboard
                 return;
             }
 
+            BankAirScore();
             state = State.Grounded;
+            PlayImpact(landingClip);
+        }
+
+        private void TickScore()
+        {
+            scoreTime += Time.fixedDeltaTime;
+
+            // Treat values within a microsecond of the next tick as a whole second.
+            int wholeSeconds = (int)(scoreTime + 0.000001);
+            if (wholeSeconds == 0) return;
+
+            scoreTime -= wholeSeconds;
+            AddScore(wholeSeconds * pointsPerSecond);
+        }
+
+        private void BankAirScore()
+        {
+            Trick completed = Trick.None;
+            if (completedAirTricks > 0)
+            {
+                AddScore(completedAirTricks * flipPoints);
+                completed = lastCompletedFlip;
+            }
+            else if (isOllie)
+            {
+                AddScore(olliePoints);
+                completed = Trick.Ollie;
+            }
+
+            completedAirTricks = 0;
+            isOllie = false;
+
+            if (completed != Trick.None)
+                TrickCompleted?.Invoke(completed);
+        }
+
+        private void AddScore(int points)
+        {
+            if (points > 0)
+                SetScore(Score + points);
+        }
+
+        private void SetScore(int total)
+        {
+            Score = total;
+
+            if (scoreText != null)
+                scoreText.text = "Score " + Score;
         }
 
         private void Crash(string reason)
         {
+            if (state == State.Crashed) return;
+
             state = State.Crashed;
             crashReason = reason;
+            crashedAt = Time.unscaledTime;
             activeTrick = Trick.None;
+            completedAirTricks = 0;
+            isOllie = false;
+            grindTime = 0f;
             body.angularVelocity = Vector3.zero;
-            Velocity = new Vector3(0f, Mathf.Min(Velocity.y, 0f), 0f);
+            Velocity = Vector3.zero;
+            body.collisionDetectionMode = CollisionDetectionMode.ContinuousSpeculative;
+            body.isKinematic = true;
+            SetCrashOverlayAlpha(crashFlashOpacity);
+            PlayImpact(hurtClip);
         }
 
         private void ResetBoard()
+        {
+            RespawnBoard();
+            scoreTime = 0.0;
+            SetScore(0);
+
+            if (trickFeed != null)
+                trickFeed.Clear();
+
+            resetRequested = false;
+        }
+
+        private void RespawnBoard()
         {
             if (body.isKinematic)
             {
@@ -522,6 +782,7 @@ namespace Fingerboard
             body.angularVelocity = Vector3.zero;
             incomingVelocity = Vector3.zero;
             state = State.Grounded;
+            crashReason = null;
             groundNormal = Vector3.up;
             hasGroundContact = false;
             visualUp = Vector3.up;
@@ -532,8 +793,49 @@ namespace Fingerboard
             deckYaw = 0f;
             grindRequested = false;
             ollieRequested = false;
-            resetRequested = false;
+            completedAirTricks = 0;
+            grindTime = 0f;
+            SetCrashOverlayAlpha(0f);
             SetAirCamera(false);
+        }
+
+        private void SetCrashOverlayAlpha(float alpha)
+        {
+            if (crashOverlay == null) return;
+
+            Color color = crashOverlay.color;
+            color.a = alpha;
+            crashOverlay.color = color;
+            crashOverlay.enabled = alpha > 0f;
+        }
+
+        private void PlayImpact(AudioClip clip)
+        {
+            if (impactSource != null && clip != null)
+                impactSource.PlayOneShot(clip);
+        }
+
+        private void UpdateMovementAudio()
+        {
+            if (cruisingSource == null) return;
+
+            AudioClip loopClip = null;
+            if (roundRunning && Time.timeScale > 0f)
+            {
+                if (state == State.Grinding)
+                    loopClip = grindingClip;
+                else if (state == State.Grounded && Velocity.sqrMagnitude > 0.01f)
+                    loopClip = cruisingClip;
+            }
+
+            if (cruisingSource.clip != loopClip)
+            {
+                cruisingSource.Stop();
+                cruisingSource.clip = loopClip;
+            }
+
+            if (loopClip != null && !cruisingSource.isPlaying)
+                cruisingSource.Play();
         }
 
         private void SetAirCamera(bool useAirCamera)
@@ -559,6 +861,7 @@ namespace Fingerboard
 
         private void LateUpdate()
         {
+            UpdateMovementAudio();
             if (state == State.RampAir) PlaceAirCamera();
             if (boardVisual == null) return;
 
